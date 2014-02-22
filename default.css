@@ -3,27 +3,31 @@ body {
 } 
 
 #board { 
-    width: 640px; 
-    height: 640px; 
+    width: 480px; 
+    height: 480px; 
     margin-right: auto; 
     margin-left: auto; 
     border: solid;
 } 
 
 .whiteSquare, .blackSquare {
-    /*border: solid;*/
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     float: left; 
 } 
 
 .whiteSquare {
-    background-color: white;
+    background-color: floralwhite;
 }
 
 .blackSquare {
-    background-color: black;
-} 
+    background-color: darkgoldenrod;
+}
+
+.piece {
+    height: 100%;
+    width: 100%;
+}
 
 .dragged { 
    

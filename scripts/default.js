@@ -14,7 +14,7 @@ function drawBoard(board) {
             var piece = square.piece;
             if (piece) {
                 var pieceClass = piece.color + piece.type;
-                var $pieceImg = $('<img class="' + pieceClass + '" src ="pieces/' + pieceClass + '.svg"/>');
+                var $pieceImg = $('<img class="' + pieceClass + ' piece" src =" pieces/' + pieceClass + '.svg"/>');
                 $pieceImg.appendTo($squareDiv);
             };            
         };
