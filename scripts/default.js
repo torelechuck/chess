@@ -3,12 +3,9 @@
 $(document).ready(function(){
     var board = initGame();
     drawBoard(board);
-    jQuery.event.props.push('dataTransfer');
-    $('#board').on('dragstart', dragStarted);
-    $('#board').on('dragend', dragEnded);
-    $('#board').on('dragenter', preventDefault);
-    $('#board').on('dragover', preventDefault);
-    $('#board').on('drop', drop);    
+    $( ".piece" ).draggable({revert: "invalid"});
+    $( ".square" ).droppable({accept: ".piece",
+                              drop: drop});
 })
 
 function drawBoard(board) {
@@ -17,13 +14,13 @@ function drawBoard(board) {
             var colorClass = 'whiteSquare';
             if (file%2 - rank%2 === 0) colorClass = 'blackSquare';
             var square = board[rank][file];
-            var $squareDiv = $('<div id ="' + square.name  + '" class ="' + colorClass + 
+            var $squareDiv = $('<div id ="' + square.name  + '" class ="square ' + colorClass + 
                                '" data-square="' + square.name + '"></div >'); 
             $squareDiv.appendTo($('#board'));
             var piece = square.piece;
             if (piece) {
                 var pieceClass = piece.color + piece.type;
-                var $pieceImg = $('<img draggable="true" class="' + pieceClass + ' piece"' + 
+                var $pieceImg = $('<img draggable="false" class="' + pieceClass + ' piece"' + 
                                   ' src =" pieces/' + pieceClass + '.svg"/>');
                 $pieceImg.appendTo($squareDiv);
             };            
@@ -31,30 +28,12 @@ function drawBoard(board) {
     };
 }
 
-function dragStarted(e) {
-    var $piece = $(e.target); 
-    $piece.addClass('dragged'); 
-    var sourceLocation = $piece.parent().data('square');
-    e.dataTransfer.setData('text', sourceLocation.toString());
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function dragEnded(e) {
-    $(e.target).removeClass('dragged');
-}
-
-function preventDefault(e) {
-    e.preventDefault();
-}
-
-function drop(e) {
-    var $square = $(e.target); 
-    if ($square.hasClass('whiteSquare') || $square.hasClass('blackSquare')) {
-        var sourceLocation = e.dataTransfer.getData('text');
-        var $draggedItem = $('#' + sourceLocation).children();
-        $draggedItem.detach();
-        $draggedItem.appendTo($square);        
-    };
+function drop(event, ui) {
+    ui.draggable
+    .detach()
+    .appendTo($(this))
+    .css("left", 0)
+    .css("top", 0);
 }
 
 /*Model*/

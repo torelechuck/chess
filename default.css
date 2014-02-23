@@ -10,7 +10,7 @@ body {
     border: solid;
 } 
 
-.whiteSquare, .blackSquare {
+.square {
     width: 60px;
     height: 60px;
     float: left; 
@@ -27,8 +27,4 @@ body {
 .piece {
     height: 100%;
     width: 100%;
-}
-
-.dragged { 
-   
 }
