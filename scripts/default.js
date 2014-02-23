@@ -1,29 +1,27 @@
 /*View*/
 
 $(document).ready(function(){
-    var board = initGame();
-    drawBoard(board);
+    initGame();
+    drawBoard();
     $( ".piece" ).draggable({revert: "invalid"});
     $( ".square" ).droppable({accept: ".piece",
                               drop: drop});
 })
 
-function drawBoard(board) {
-    for (var rank = board.length - 1; rank >= 0; rank--) {
-        for (var file = 0; file < board.length; file++) {
-            var colorClass = 'whiteSquare';
-            if (file%2 - rank%2 === 0) colorClass = 'blackSquare';
-            var square = board[rank][file];
-            var $squareDiv = $('<div id ="' + square.name  + '" class ="square ' + colorClass + 
-                               '" data-square="' + square.name + '"></div >'); 
-            $squareDiv.appendTo($('#board'));
-            var piece = square.piece;
-            if (piece) {
-                var pieceClass = piece.color + piece.type;
-                var $pieceImg = $('<img draggable="false" class="' + pieceClass + ' piece"' + 
-                                  ' src =" pieces/' + pieceClass + '.svg"/>');
-                $pieceImg.appendTo($squareDiv);
-            };            
+function drawBoard() {
+    squares = getSquares();
+    for(var i = 0; i < squares.length; i++) {
+        var square = squares[i];
+        var $squareDiv = $('<div id ="' + square.name  + '" class ="square ' + square.color + "Square" + 
+                           '" data-square="' + square.name + '"></div >'); 
+        $squareDiv.appendTo($('#board'));
+        var piece = square.piece;
+        if (piece) {
+            var pieceClass = piece.color + piece.type;
+            var $pieceImg = $('<img draggable="false" class="' + pieceClass + ' piece"' + 
+                              ' src =" pieces/' + pieceClass + '.svg"/>');
+            $pieceImg.appendTo($squareDiv);
+
         };
     };
 }
@@ -38,10 +36,22 @@ function drop(event, ui) {
 
 /*Model*/
 
+var gameBoard = null;
+
+function getSquares(orientation) {
+    var result = [];
+    for (var rank = gameBoard.length - 1; rank >= 0; rank--) {
+        for (var file = 0; file < gameBoard.length; file++) {
+          result.push(gameBoard[rank][file]);
+        };
+    };        
+    return result;
+}
+
 function initGame() {
-    var board = initBoard();
-    initPieces(board);
-    return board;
+    gameBoard = initBoard();
+    initPieces(gameBoard);
+    return gameBoard;
 }
 
 function initBoard() {
@@ -50,9 +60,12 @@ function initBoard() {
     for (var rank = 0; rank < board.length; rank++) {
         board[rank] = new Array(8);
         for (var file = 0; file < board[rank].length; file++) {
+            var color = 'white';
+            if (file%2 - rank%2 === 0) color = 'black';
             board[rank][file] = {
                 name: fileLetters[file] + (rank + 1),
-                piece: null
+                piece: null,
+                color: color
             };
         };
     };
