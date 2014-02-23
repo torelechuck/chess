@@ -1,3 +1,5 @@
+module( 'Setup game' );
+
 test( "test board size", function() {
     var board = initGame();
     strictEqual( board.length, 8, "Board height is 8." );
@@ -67,4 +69,47 @@ test( "test prefixes for non-pawns", function() {
     for(var i = 0; i < 8; i++){
         strictEqual(board[0][i].piece.prefix, prefixes[i], "prefix on white rank");
     };
+});
+
+
+var board;
+
+module( 'Chess moves', {
+    setup: function() {
+        board = initBoard();
+        board[3][4].piece = {type: "pawn",
+                             prefix: "",
+                             color: "white"
+                            };
+        board[4][3].piece = {type: "pawn",
+                             prefix: "",
+                             color: "black"
+                            };
+        board[4][5].piece = {type: "bishop",
+                             prefix: "B",
+                             color: "white"
+                            };
+    }
+});
+
+test( "test squareNameToCoordinates returns the correct coordinates", function() {
+    deepEqual(squareNameToCoordinates("e2"), {rank:1, file:4}, "e2 returns 1,4");
+    deepEqual(squareNameToCoordinates("h6"), {rank:5, file:7}, "h6 returns 5,7");
+});
+
+test( "test isCapture when white pawn moves to black pawn", function() {
+    ok( isCapture("e4", "d5", board), "pawn capture");
+});
+
+test( "test not isCapture when white pawn moves empty square", function() {
+    ok(!isCapture("e4", "e5", board), "pawn does not capture");
+});
+
+test( "test not isCapture when white pawn moves to white pawn square", function() {
+    ok(!isCapture("e4", "f5", board), "pawn does not capture");
+});
+
+test( "test move will move e4 pawn to e5", function() {
+    move("e4", "e5", board);
+    deepEqual(board[4][4].piece, {type:"pawn", prefix:"", color:"white"});
 });

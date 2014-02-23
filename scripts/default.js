@@ -12,8 +12,7 @@ function drawBoard() {
     squares = getSquares();
     for(var i = 0; i < squares.length; i++) {
         var square = squares[i];
-        var $squareDiv = $('<div id ="' + square.name  + '" class ="square ' + square.color + "Square" + 
-                           '" data-square="' + square.name + '"></div >'); 
+        var $squareDiv = $('<div id ="' + square.name  + '" class ="square ' + square.color + "Square" + '"></div >'); 
         $squareDiv.appendTo($('#board'));
         var piece = square.piece;
         if (piece) {
@@ -27,16 +26,23 @@ function drawBoard() {
 }
 
 function drop(event, ui) {
+    var fromSquare = ui.draggable.parent().attr("id");
+    var toSquare = $(this).attr("id");
+    if( isCapture(fromSquare, toSquare, gameBoard)) {
+        $(this).children().remove();
+    }
     ui.draggable
     .detach()
     .appendTo($(this))
     .css("left", 0)
     .css("top", 0);
+    move(fromSquare, toSquare, gameBoard);
 }
 
 /*Model*/
 
 var gameBoard = null;
+var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 function getSquares(orientation) {
     var result = [];
@@ -55,7 +61,6 @@ function initGame() {
 }
 
 function initBoard() {
-    var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     var board = new Array(8);
     for (var rank = 0; rank < board.length; rank++) {
         board[rank] = new Array(8);
@@ -100,7 +105,25 @@ function initNonPawns(rank, color) {
     };
 }
 
+function move(fromSquare, toSquare, board) {
+    var fromCoord = squareNameToCoordinates(fromSquare);
+    var toCoord = squareNameToCoordinates(toSquare);
+    var piece = board[fromCoord.rank][fromCoord.file].piece;
+    board[fromCoord.rank][fromCoord.file].piece = null;
+    board[toCoord.rank][toCoord.file].piece = piece;
+}
 
+function isCapture(fromSquare, toSquare, board) {
+    var fromCoord = squareNameToCoordinates(fromSquare);
+    var toCoord = squareNameToCoordinates(toSquare);
+    var movingPiece = board[fromCoord.rank][fromCoord.file].piece;
+    var capturedPiece = board[toCoord.rank][toCoord.file].piece;
+    if (!movingPiece || !capturedPiece) return false;
+    return movingPiece.color !== capturedPiece.color;
+}
 
-
+function squareNameToCoordinates(squareName) {
+    return {rank:parseInt(squareName[1])-1, 
+            file:fileLetters.indexOf(squareName[0])};
+}
 
