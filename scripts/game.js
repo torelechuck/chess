@@ -8,22 +8,22 @@ var game = function () {
     //Private functions for initialization of pieces on their initial positions:
 
     function init() {
-        initNonPawns(0, "white");
-        initPawns(1, "white");
-        initPawns(6, "black");
-        initNonPawns(7, "black");
-    };
+        initNonPawns("white", 0);
+        initPawns("white", 1);
+        initPawns("black", 6);
+        initNonPawns("black", 7);
+    }
 
     function initPiece(file, rank, piece) {
-        squareName = fileLetters[file] + rank.toString();
+        var squareName = fileLetters[file] + rank.toString();
         positionHistory[0][squareName] = piece;
-    };
+    }
 
     function initPawns (color, rank) {
-        for (var file = 0; file < rank.length; file++) {
+        for (var file = 0; file < 8; file++) {
             initPiece(file, rank, pawn(color));
-        };
-    };
+        }
+    }
 
     function initNonPawns(color, rank) {
         initPiece(0, rank, rook(color));
@@ -34,15 +34,15 @@ var game = function () {
         initPiece(5, rank, bishop(color));
         initPiece(6, rank, knight(color));
         initPiece(7, rank, rook(color));
-    };
+    }
 
     init();
 
     //Gets the position of the game after the move given by index, index 0 is the initial position.
     //Will get the current position if index is not given.
     that.getPosition = function (index) {
-        if (!index) index = position.length - 1;
-        return positionHistory[position];
+        if (!index) index = positionHistory.length - 1;
+        return positionHistory[index];
     };
 
     that.move = function (fromSquare, toSquare) {
@@ -53,13 +53,12 @@ var game = function () {
 
     };
 
-}
+    return that;
+};
 
 //base object pieces
 var piece = function (spec) {
     var that = {};
-
-    var position  = spec.initialPosition;
 
     that.getType = function () { return spec.type; };
 
@@ -103,7 +102,7 @@ var bishop = function (color) {
 };
 
 function getBishopMoves(position) {
-    
+
 }
 
 var queen = function (color) {
