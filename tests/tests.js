@@ -9,12 +9,12 @@ module( 'Setup game', {
         for (var i = 0; i < 8; i++) {
             squares.push([]);
             for (var j = 0; j < 8; j++) {
-                squares[i].push(fileLetters[j] + i.toString());
+                var rank = i + 1;
+                squares[i].push(fileLetters[j] + rank.toString());
             }
         }
     }
 });
-
 
 //Helper function
 function checkSquare(square, type, color) {

@@ -1,42 +1,44 @@
 //using the functional pattern for object creation/inheritance, described in "JavaScript, The good parts"
 
-var game = function () {
+var game = function (fen) {
     var that = {};
     var positionHistory = [{}];
     var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
     //Private functions for initialization of pieces on their initial positions:
 
-    function init() {
-        initNonPawns("white", 0);
-        initPawns("white", 1);
-        initPawns("black", 6);
-        initNonPawns("black", 7);
-    }
-
     function initPiece(file, rank, piece) {
-        var squareName = fileLetters[file] + rank.toString();
+        var squareName = fileLetters[file-1] + rank.toString();
         positionHistory[0][squareName] = piece;
     }
 
-    function initPawns (color, rank) {
-        for (var file = 0; file < 8; file++) {
-            initPiece(file, rank, pawn(color));
+    function init(fen) {
+        if (!fen) {
+            //FEN for starting position
+            fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
         }
-    }
+        var pieceConstructors = {p: pawn, r: rook, n: knight, b: bishop, q: queen, k: king};
+        var rank = 8;
+        var file = 0;
+        var fenParts = fen.split(' ');
+        for ( var i = 0; i < fenParts[0].length; i++ ) {
+            var chr = fen.charAt(i);
+            if (chr >= '0' && chr <= '9') {
+                file += parseInt(chr, 10);
+            } else if (chr === '/') {   
+                rank--;
+                file = 0;
+            } else {
+                file++;
+                var color = 'black';
+                if ( chr === chr.toUpperCase() ) { color = 'white'; }
+                var piece = pieceConstructors[chr.toLowerCase()](color);
+                initPiece(file, rank, piece);
+            }
+        }
+     }
 
-    function initNonPawns(color, rank) {
-        initPiece(0, rank, rook(color));
-        initPiece(1, rank, knight(color));
-        initPiece(2, rank, bishop(color));
-        initPiece(3, rank, queen(color));
-        initPiece(4, rank, king(color));
-        initPiece(5, rank, bishop(color));
-        initPiece(6, rank, knight(color));
-        initPiece(7, rank, rook(color));
-    }
-
-    init();
+     init(fen);
 
     //Gets the position of the game after the move given by index, index 0 is the initial position.
     //Will get the current position if index is not given.
