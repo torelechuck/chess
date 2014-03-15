@@ -1,4 +1,6 @@
+//globals vars initialized in setup functions
 var newGame, initPos, squares;
+var unblockedPos, blockedPos;
 
 module( 'Setup game', {
     setup: function() {
@@ -97,8 +99,6 @@ test('test is not on board', function () {
     ok(!isOnBoard([1,0]), '[1,0] is on board');
 });
 
-var unblockedPos, blockedPos;
-
 module( 'bishop moves', {
     setup: function() {
         newGame = game();
@@ -131,4 +131,63 @@ test('test bishop can not move past square of opposing piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
     ok(jQuery.inArray('a7', calculatedMoves) === -1, 'square past opposing piece (a7) not in bishop moves from d4')
 });
+
+module( 'rook moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+        unblockedPos = game('8/8/8/8/3R4/8/8/8').getPosition();
+        blockedPos = game('8/8/3b4/8/3R4/8/3N4/8').getPosition();
+    }
+});
+
+test('test no legal rook moves when blocked on init position', function () {
+    deepEqual(initPos["a1"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["h1"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["a8"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["h8"].getMoves(initPos), [], "no legal moves on square c3");
+});
+
+test('test legal moves non-blocked rook on d4', function () {
+    var legalMoves = ['d5', 'd6', 'd7', 'd8', 'e4', 'f4', 'g4', 'h4',
+                      'd3', 'd2', 'd1', 'c4', 'b4', 'a4'];
+    var calculatedMoves = unblockedPos['d4'].getMoves(unblockedPos);
+    deepEqual(calculatedMoves.sort(), legalMoves.sort(), "unblocked rook moves");
+});
+
+test('test rook can move to square of opposing piece', function () {
+    var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
+    ok(jQuery.inArray('d6', calculatedMoves) > -1, 'square of opposing piece (d6) in rook moves from d4')
+});
+
+test('test rook can not move past square of opposing piece', function () {
+    var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
+    ok(jQuery.inArray('d7', calculatedMoves) === -1, 'square past opposing piece (d7) not in rook moves from d4')
+});
+
+test('test rook can not move to square of same color piece', function () {
+    var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
+    ok(jQuery.inArray('d2', calculatedMoves) === -1, 'square on same color piece (d2) not in rook moves from d4')
+});
+
+module( 'queen moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+        blockedPos = game('8/R2N4/5r2/8/3Q4/8/3b4/8').getPosition();
+    }
+});
+
+test('test no legal queen moves when blocked on init position', function () {
+    deepEqual(initPos["d1"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["d8"].getMoves(initPos), [], "no legal moves on square c3");
+});
+
+test('test blocking/non-blocking queen moves', function () {
+    var legalMoves = ['a1', 'a2', 'a3', 'c5', 'b6', 'e3', 'f2', 'g1', 'e5', 'f6',
+                      'd5', 'd6', 'e4', 'f4', 'g4', 'h4', 'd3', 'd2', 'c4', 'b4', 'a4'];
+    var calculatedMoves =  blockedPos['d4'].getMoves(blockedPos);
+    deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked queen moves");
+});
+
 

@@ -84,6 +84,11 @@ var rook = function (spec) {
     spec.type = "rook";
     spec.prefix = "R";    
     var that = piece(spec);
+
+    that.getMoves =  function (position) {
+        return getRookMoves(that, position); 
+    };
+
     return that;
 };
 
@@ -100,14 +105,53 @@ var bishop = function (spec) {
     spec.prefix = "B";    
     var that = piece(spec);
 
-    that.getMoves = function (position) { return getBishopMoves(that, position); };//(that);
+    that.getMoves = function (position) { 
+        return getBishopMoves(that, position);
+    };
 
     return that;
 };
 
+var queen = function (spec) {
+    spec.type = "queen";
+    spec.prefix = "Q";     
+    var that = piece(spec);
+
+    that.getMoves = function (position) {
+        return getQueenMoves(that, position);
+    };
+
+    return that;
+};
+
+var king = function (spec) {
+    spec.type = "king";
+    spec.prefix = "K";    
+    var that = piece(spec);
+    return that;
+};
+
+//Move functions
+
+function getRookMoves(piece, position) {
+    var deltas = [[1,0], [0, 1], [-1, 0], [0, -1]];
+    return getStraightLineMoves(piece, position, deltas); 
+}
+
 function getBishopMoves(piece, position) {
+        var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
+        return getStraightLineMoves(piece, position, deltas); 
+}
+
+function getQueenMoves(piece, position) {
+    var bishopMoves = getBishopMoves(piece, position);
+    var rookMoves = getRookMoves(piece, position);
+    return bishopMoves.concat(rookMoves);
+}
+
+//helper function for bishop, rook and queen moves
+function getStraightLineMoves(piece, position, deltas) {
     var res = [];
-    var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
     var square, otherColor;
     for (var i = 0; i < deltas.length; i++) {
         var coords = squareToCoords(piece.getSquare());
@@ -130,20 +174,6 @@ function getBishopMoves(piece, position) {
     }
     return res;
 }
-
-var queen = function (spec) {
-    spec.type = "queen";
-    spec.prefix = "Q";     
-    var that = piece(spec);
-    return that;
-};
-
-var king = function (spec) {
-    spec.type = "king";
-    spec.prefix = "K";    
-    var that = piece(spec);
-    return that;
-};
 
 //utility functions
 
