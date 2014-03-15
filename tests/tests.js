@@ -16,7 +16,7 @@ module( 'Setup game', {
     }
 });
 
-//Helper function
+//helper function
 function checkSquare(square, type, color) {
     var piece = initPos[square];
     ok(piece.getType() === type && piece.getColor() === color, 
@@ -71,4 +71,48 @@ test("test initial queen posititions", function () {
 test("test initial king posititions", function () {
     checkSquare(squares[0][4], "king", "white");
     checkSquare(squares[7][4], "king", "black");
+});
+
+module( 'Legal moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();  
+    }
+});
+
+test('test squareToCoords', function () {
+    deepEqual([4,5], squareToCoords('e4'), '[4,5] equal to e4');
+});
+
+test('test coordsToSquare', function () {
+    deepEqual('e4', coordsToSquare([4,5]), 'e4 equal to [4,5]');
+});
+
+test('test is on board', function () { 
+    ok(isOnBoard([4,5]), '[4,5] (e4) is on board');
+    ok(isOnBoard([1,1]), '[1,1] (a1) is on board');
+    ok(isOnBoard([8,8]), '[8,8] (h8) is on board');
+    ok(isOnBoard([1,8]), '[1,8] (h1) is on board');
+});
+
+test('test is not on board', function () { 
+    ok(!isOnBoard([9,5]), '[9,5] is on board');
+    ok(!isOnBoard([0,1]), '[0,1] is on board');
+    ok(!isOnBoard([4,9]), '[4,9] is on board');
+    ok(!isOnBoard([1,0]), '[1,0] is on board');
+});
+
+test('test no legal bishop moves when blocked on init position', function () {
+    deepEqual(initPos["c1"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["f1"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["c8"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["f8"].getMoves(initPos), [], "no legal moves on square c3");
+});
+
+test('test legal moves non-blocked bishop on d4', function () {
+    var pos = game('4k3/8/8/8/3B4/8/8/3K4').getPosition();
+    var legalMoves = ['a1', 'b2', 'c3', 'e5', 'f6', 'g7', 'h8',
+                      'g1', 'f2', 'e3', 'c5', 'b6', 'a7'];
+    var calculatedMoves = pos['d4'].getMoves(pos);
+    deepEqual(calculatedMoves.sort(), legalMoves.sort(), "bishop moves");
 });

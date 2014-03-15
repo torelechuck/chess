@@ -3,15 +3,8 @@
 var game = function (fen) {
     var that = {};
     var positionHistory = [{}];
-    var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-    //Private functions for initialization of pieces on their initial positions:
-
-    function initPiece(file, rank, piece) {
-        var squareName = fileLetters[file-1] + rank.toString();
-        positionHistory[0][squareName] = piece;
-    }
-
+    //initialization of pieces on their initial squares
     function init(fen) {
         if (!fen) {
             //FEN for starting position
@@ -32,8 +25,9 @@ var game = function (fen) {
                 file++;
                 var color = 'black';
                 if ( chr === chr.toUpperCase() ) { color = 'white'; }
-                var piece = pieceConstructors[chr.toLowerCase()](color);
-                initPiece(file, rank, piece);
+                var square = fileCoordToLetter(file) + rank.toString();
+                var piece = pieceConstructors[chr.toLowerCase()]({color: color, square: square});
+                positionHistory[0][square] = piece;
             }
         }
      }
@@ -58,9 +52,13 @@ var game = function (fen) {
     return that;
 };
 
+//Piece objects
+
 //base object pieces
 var piece = function (spec) {
     var that = {};
+
+    var square = spec.square;
 
     that.getType = function () { return spec.type; };
 
@@ -68,53 +66,103 @@ var piece = function (spec) {
 
     that.getColor = function () { return spec.color; };
 
-    that.getPosition = function () { return position; };
+    that.getSquare = function () { return square; };
 
-    that.move = function (newPosition) { position = newPosition; };
+    that.move = function (newSquare) { square = newSquare; };
 
     return that;
 };
 
-var pawn = function (color) {
-    var spec = {color: color, type: "pawn", prefix: ""};    
+var pawn = function (spec) {
+    spec.type = "pawn";
+    spec.prefix = "";    
     var that = piece(spec);
     return that;
 };
 
-var rook = function (color) {
-    var spec = {color: color, type: "rook", prefix: "R"};    
+var rook = function (spec) {
+    spec.type = "rook";
+    spec.prefix = "R";    
     var that = piece(spec);
     return that;
 };
 
-var knight = function (color) {
-    var spec = {color: color, type: "knight", prefix: "N"};    
+var knight = function (spec) {
+    spec.type = "knight";
+    spec.prefix = "N";    
     var that = piece(spec);
 
     return that;
 };
 
-var bishop = function (color) {
-    var spec = {color: color, type: "bishop", prefix: "B"};    
+var bishop = function (spec) {
+    spec.type = "bishop";
+    spec.prefix = "B";    
     var that = piece(spec);
 
-    that.getMoves = getBishopMoves;
+    that.getMoves = function (position) { return getBishopMoves(that, position); };//(that);
 
     return that;
 };
 
-function getBishopMoves(position) {
-
+function getBishopMoves(piece, position) {
+    var res = [];
+    var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
+    var coords = [];
+    for (var i = 0; i < deltas.length; i++) {
+        coords = squareToCoords(piece.getSquare());
+        do {
+            coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
+            if (isOnBoard(coords)) {
+                res.push(coordsToSquare(coords));    
+            } else {
+                break;
+            }
+        } while (true);
+    }
+    return res;
 }
 
-var queen = function (color) {
-    var spec = {color: color, type: "queen", prefix: "Q"};    
+var queen = function (spec) {
+    spec.type = "queen";
+    spec.prefix = "Q";     
     var that = piece(spec);
     return that;
 };
 
-var king = function (color) {
-    var spec = {color: color, type: "king", prefix: "K"};    
+var king = function (spec) {
+    spec.type = "king";
+    spec.prefix = "K";    
     var that = piece(spec);
     return that;
 };
+
+//utility functions
+
+function isOnBoard(coords) {
+    var rank = coords[0];
+    var file = coords[1];
+    return (1 <= rank && rank <= 8) && (1 <= file && file <= 8);
+}
+
+function squareToCoords (square) {
+    return [parseInt(square[1]), fileLetterToCoord(square[0])];
+}
+
+function coordsToSquare (coords) {
+    return fileCoordToLetter(coords[1]) + coords[0].toString();
+}
+
+var fileCoordToLetter = (function () {
+    var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    return function (index) {
+        return letters[index - 1];
+    };
+})();
+
+var fileLetterToCoord = (function () {
+    var indexes = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 7};
+    return function (letter) {
+        return indexes[letter];
+    };
+})();
