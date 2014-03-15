@@ -108,19 +108,23 @@ var bishop = function (spec) {
 function getBishopMoves(piece, position) {
     var res = [];
     var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
+    var square, otherColor;
     for (var i = 0; i < deltas.length; i++) {
         var coords = squareToCoords(piece.getSquare());
         do {
             coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
-            var square = coordsToSquare(coords);
-            var otherColor;
+            square = coordsToSquare(coords);
             if (position[square]) { 
                 otherColor = position[square].getColor();
             }
-            if (isOnBoard(coords) && (!otherColor || piece.getColor() !== otherColor)) {
-                res.push(square);    
-            } else {
+            
+            if (!isOnBoard(coords) || (otherColor && piece.getColor() === otherColor)) {
                 break;
+            } else if (otherColor && piece.getColor() !== otherColor) {
+                res.push(square);
+                break;
+            } else {
+                res.push(square)
             }
         } while (true);
     }

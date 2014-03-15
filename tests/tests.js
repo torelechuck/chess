@@ -73,12 +73,7 @@ test("test initial king posititions", function () {
     checkSquare(squares[7][4], "king", "black");
 });
 
-module( 'Legal moves', {
-    setup: function() {
-        newGame = game();
-        initPos = newGame.getPosition();  
-    }
-});
+module( 'utility functions' );
 
 test('test squareToCoords', function () {
     deepEqual([4,5], squareToCoords('e4'), '[4,5] equal to e4');
@@ -102,6 +97,17 @@ test('test is not on board', function () {
     ok(!isOnBoard([1,0]), '[1,0] is on board');
 });
 
+var unblockedPos, blockedPos;
+
+module( 'bishop moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+        unblockedPos = game('4k3/8/8/8/3B4/8/8/3K4').getPosition();
+        blockedPos = game('8/8/1r6/8/3B4/8/8/8').getPosition();
+    }
+});
+
 test('test no legal bishop moves when blocked on init position', function () {
     deepEqual(initPos["c1"].getMoves(initPos), [], "no legal moves on square c3");
     deepEqual(initPos["f1"].getMoves(initPos), [], "no legal moves on square c3");
@@ -110,9 +116,19 @@ test('test no legal bishop moves when blocked on init position', function () {
 });
 
 test('test legal moves non-blocked bishop on d4', function () {
-    var pos = game('4k3/8/8/8/3B4/8/8/3K4').getPosition();
     var legalMoves = ['a1', 'b2', 'c3', 'e5', 'f6', 'g7', 'h8',
                       'g1', 'f2', 'e3', 'c5', 'b6', 'a7'];
-    var calculatedMoves = pos['d4'].getMoves(pos);
+    var calculatedMoves = unblockedPos['d4'].getMoves(unblockedPos);
     deepEqual(calculatedMoves.sort(), legalMoves.sort(), "bishop moves");
 });
+
+test('test bishop can move to square of opposing piece', function () {
+    var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
+    ok(jQuery.inArray('b6', calculatedMoves) > -1, 'square of opposing piece (b6) in bishop moves from d4')
+});
+
+test('test bishop can not move past square of opposing piece', function () {
+    var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
+    ok(jQuery.inArray('a7', calculatedMoves) === -1, 'square past opposing piece (a7) not in bishop moves from d4')
+});
+
