@@ -158,6 +158,7 @@ function getStraightLineMoves(piece, position, deltas) {
         do {
             coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
             square = coordsToSquare(coords);
+            otherColor = null;
             if (position[square]) { 
                 otherColor = position[square].getColor();
             }

@@ -184,7 +184,7 @@ test('test no legal queen moves when blocked on init position', function () {
 });
 
 test('test blocking/non-blocking queen moves', function () {
-    var legalMoves = ['a1', 'a2', 'a3', 'c5', 'b6', 'e3', 'f2', 'g1', 'e5', 'f6',
+    var legalMoves = ['a1', 'b2', 'c3', 'c5', 'b6', 'e3', 'f2', 'g1', 'e5', 'f6',
                       'd5', 'd6', 'e4', 'f4', 'g4', 'h4', 'd3', 'd2', 'c4', 'b4', 'a4'];
     var calculatedMoves =  blockedPos['d4'].getMoves(blockedPos);
     deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked queen moves");
