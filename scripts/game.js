@@ -97,6 +97,10 @@ var knight = function (spec) {
     spec.prefix = "N";    
     var that = piece(spec);
 
+    that.getMoves = function (position) {
+        return getKnightMoves(that, position);
+    }
+
     return that;
 };
 
@@ -128,10 +132,46 @@ var king = function (spec) {
     spec.type = "king";
     spec.prefix = "K";    
     var that = piece(spec);
+
+    that.getMoves = function (position) {
+        return getKingMoves(that, position)
+    };
+
     return that;
 };
 
 //Move functions
+
+function getKnightMoves(piece, position) {
+    var deltas = [[2, 1], [1, 2], [-1, 2], [-2, 1], 
+                  [-2, -1], [-1, -2], [1, -2], [2, -1]];
+    return getKingAndKnightMoves(piece, position, deltas)
+}
+
+function getKingMoves(piece, position) {
+    var deltas = [[1, 0], [1, 1], [0, 1], [-1, 1], 
+                  [-1, 0], [-1, -1], [0, -1], [-1, -1]];
+    return getKingAndKnightMoves(piece, position, deltas);
+}
+
+function getKingAndKnightMoves(piece, position, deltas) {
+    var destSquare, destCoord, otherColor;
+    var res = [];
+    var sourceCoords = squareToCoords(piece.getSquare());
+    for (var i = 0; i < deltas.length; i++) {
+        destCoords = [sourceCoords[0] + deltas[i][0], sourceCoords[1]+ deltas[i][1]];
+        destSquare = coordsToSquare(destCoords);
+        otherColor = null;
+        if (position[destSquare]) { 
+            otherColor = position[destSquare].getColor();
+        }
+
+        if (isOnBoard(destCoords) && (!otherColor || piece.getColor() !== otherColor)) {
+            res.push(destSquare);
+        }
+    }
+    return res;
+}
 
 function getRookMoves(piece, position) {
     var deltas = [[1,0], [0, 1], [-1, 0], [0, -1]];
@@ -152,9 +192,9 @@ function getQueenMoves(piece, position) {
 //helper function for bishop, rook and queen moves
 function getStraightLineMoves(piece, position, deltas) {
     var res = [];
-    var square, otherColor;
+    var square, otherColor, coords;
     for (var i = 0; i < deltas.length; i++) {
-        var coords = squareToCoords(piece.getSquare());
+        coords = squareToCoords(piece.getSquare());
         do {
             coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
             square = coordsToSquare(coords);

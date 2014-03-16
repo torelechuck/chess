@@ -179,8 +179,8 @@ module( 'queen moves', {
 });
 
 test('test no legal queen moves when blocked on init position', function () {
-    deepEqual(initPos["d1"].getMoves(initPos), [], "no legal moves on square c3");
-    deepEqual(initPos["d8"].getMoves(initPos), [], "no legal moves on square c3");
+    deepEqual(initPos["d1"].getMoves(initPos), [], "no legal moves on square d1");
+    deepEqual(initPos["d8"].getMoves(initPos), [], "no legal moves on square d8");
 });
 
 test('test blocking/non-blocking queen moves', function () {
@@ -190,4 +190,42 @@ test('test blocking/non-blocking queen moves', function () {
     deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked queen moves");
 });
 
+module( 'knight moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+        blockedPos = game('8/8/8/b7/8/1N6/8/2Q5').getPosition();
+    }
+});
 
+test('test legal knight moves on init position', function () {
+    deepEqual(initPos["b1"].getMoves(initPos).sort(), ['a3', 'c3'].sort(), "legal move b1 knight on init");
+    deepEqual(initPos["g1"].getMoves(initPos).sort(), ['f3', 'h3'].sort(), "legal move g1 knight on init");
+    deepEqual(initPos["b8"].getMoves(initPos).sort(), ['a6', 'c6'].sort(), "legal move b8 knight on init");
+    deepEqual(initPos["g8"].getMoves(initPos).sort(), ['f6', 'h6'].sort(), "legal move g8 knight on init");
+});
+
+test('test blocking/non-blocking knight moves', function () {
+    var legalMoves = ['c5', 'd4','d2', 'a1', 'a5'];
+    var calculatedMoves =  blockedPos['b3'].getMoves(blockedPos);
+    deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked knight moves");
+});
+
+module( 'king moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+        blockedPos = game('8/8/8/8/1N6/k7/1b6/8').getPosition();
+    }
+});
+
+test('test no legal king moves on init position', function () {
+    deepEqual(initPos["e1"].getMoves(initPos), [], "no legal moves on square e1");
+    deepEqual(initPos["e8"].getMoves(initPos), [], "no legal moves on square e8");
+});
+
+test('test blocking/non-blocking king moves', function () {
+    var legalMoves = ['a4', 'b4','b3', 'a2'];
+    var calculatedMoves =  blockedPos['a3'].getMoves(blockedPos);
+    deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked king moves");
+});
