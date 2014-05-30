@@ -229,3 +229,14 @@ test('test blocking/non-blocking king moves', function () {
     var calculatedMoves =  blockedPos['a3'].getMoves(blockedPos);
     deepEqual(calculatedMoves.sort(), legalMoves.sort(), "blocked/unblocked king moves");
 });
+
+module( 'pawn moves', {
+    setup: function() {
+        newGame = game();
+        initPos = newGame.getPosition();
+    }
+});
+
+test('test white pawn can move up one to empty square', function() {
+    ok(initPos["e2"].getMoves(initPos).indexOf('e3') > -1, "e2 pawn can move to empty e3");
+});

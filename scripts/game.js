@@ -76,9 +76,19 @@ var piece = function (spec) {
 var pawn = function (spec) {
     spec.type = "pawn";
     spec.prefix = "";    
+
     var that = piece(spec);
+ 
+    that.getMoves = function (position) {
+        return getPawnMoves(that, position)
+    };
+ 
     return that;
 };
+
+function getPawnMoves (piece, position) {
+
+}
 
 var rook = function (spec) {
     spec.type = "rook";
@@ -245,3 +255,4 @@ var fileLetterToCoord = (function () {
         return indexes[letter];
     };
 })();
+
