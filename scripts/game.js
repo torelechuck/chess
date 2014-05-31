@@ -10,7 +10,8 @@ var game = function (fen) {
             //FEN for starting position
             fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
         }
-        var pieceConstructors = {p: pawn, r: rook, n: knight, b: bishop, q: queen, k: king};
+        var pieceConstructors = {p: blackPawn, r: rook, n: knight, b: bishop, q: queen, k: king,
+                                 P: whitePawn, R: rook, N: knight, B: bishop, Q: queen, K: king};
         var rank = 8;
         var file = 0;
         var fenParts = fen.split(' ');
@@ -26,7 +27,7 @@ var game = function (fen) {
                 var color = 'black';
                 if ( chr === chr.toUpperCase() ) { color = 'white'; }
                 var square = fileCoordToLetter(file) + rank.toString();
-                var piece = pieceConstructors[chr.toLowerCase()]({color: color, square: square});
+                var piece = pieceConstructors[chr]({color: color, square: square});
                 positionHistory[0][square] = piece;
             }
         }
@@ -80,15 +81,31 @@ var pawn = function (spec) {
     var that = piece(spec);
  
     that.getMoves = function (position) {
-        return getPawnMoves(that, position)
+        return getPawnMoves(that, position);
     };
- 
+    
     return that;
 };
 
-function getPawnMoves (piece, position) {
+var whitePawn = function (spec) {
+    var that = pawn(spec);
 
-}
+    that.getDir = function () { return 1; };
+    that.getInitRank = function () { return 2; };
+    that.getPromotionRank = function () { return 8; };
+
+    return that;
+};
+
+var blackPawn = function (spec) {
+    var that = pawn(spec);
+
+    that.getDir = function () { return -1; };
+    that.getInitRank = function () { return 7; };
+    that.getPromotionRank = function () { return 1; };
+
+    return that;
+};
 
 var rook = function (spec) {
     spec.type = "rook";
@@ -109,7 +126,7 @@ var knight = function (spec) {
 
     that.getMoves = function (position) {
         return getKnightMoves(that, position);
-    }
+    };
 
     return that;
 };
@@ -144,7 +161,7 @@ var king = function (spec) {
     var that = piece(spec);
 
     that.getMoves = function (position) {
-        return getKingMoves(that, position)
+        return getKingMoves(that, position);
     };
 
     return that;
@@ -152,10 +169,42 @@ var king = function (spec) {
 
 //Move functions
 
+function getPawnMoves (piece, position) {
+    var res = [];
+    var coords = squareToCoords(piece.getSquare());
+    //move one square forward
+    var move1Coords = [coords[0] + piece.getDir(), coords[1]];
+    var move1Square = coordsToSquare(move1Coords);
+    if (isOnBoard(move1Coords) && !position[move1Square]) {
+        res.push(move1Square);
+    }
+    //move two squares forward
+    if (coords[0] === piece.getInitRank()) {
+        var move2Coords = [coords[0] + 2*piece.getDir(), coords[1]];
+        var move2Square = coordsToSquare(move2Coords);
+        if (!position[move1Square] && !position[move2Square]) {
+           res.push(move2Square); 
+        }
+    }
+    //capture on diagonal neighbour
+    function addDiagonalMove (captureCoords) {
+        var captureSquare = coordsToSquare(captureCoords);
+        if (isOnBoard(captureCoords) && 
+            position[captureSquare] && 
+            position[captureSquare].getColor() !== piece.getColor()) {
+                res.push(captureSquare);
+        }
+    }
+    addDiagonalMove([coords[0] + piece.getDir(), coords[1] - 1]);
+    addDiagonalMove([coords[0] + piece.getDir(), coords[1] + 1]);
+    //TODO: promotion and en passant.
+    return res;
+}
+
 function getKnightMoves(piece, position) {
     var deltas = [[2, 1], [1, 2], [-1, 2], [-2, 1], 
                   [-2, -1], [-1, -2], [1, -2], [2, -1]];
-    return getKingAndKnightMoves(piece, position, deltas)
+    return getKingAndKnightMoves(piece, position, deltas);
 }
 
 function getKingMoves(piece, position) {
@@ -165,7 +214,7 @@ function getKingMoves(piece, position) {
 }
 
 function getKingAndKnightMoves(piece, position, deltas) {
-    var destSquare, destCoord, otherColor;
+    var destSquare, destCoords, otherColor;
     var res = [];
     var sourceCoords = squareToCoords(piece.getSquare());
     for (var i = 0; i < deltas.length; i++) {
@@ -219,7 +268,7 @@ function getStraightLineMoves(piece, position, deltas) {
                 res.push(square);
                 break;
             } else {
-                res.push(square)
+                res.push(square);
             }
         } while (true);
     }

@@ -234,9 +234,46 @@ module( 'pawn moves', {
     setup: function() {
         newGame = game();
         initPos = newGame.getPosition();
+        //blocked f pawns, and d pawn blocked on 4th/5th rank 
+        blockedPos = game('rnbqk2r/pppppp1p/5Np1/3B4/3b4/5nP1/PPPPPP1P/RNBQK2R').getPosition();
     }
 });
 
-test('test white pawn can move up one to empty square', function() {
-    ok(initPos["e2"].getMoves(initPos).indexOf('e3') > -1, "e2 pawn can move to empty e3");
+test('test pawn can one square forward to empty square', function() {
+    ok(initPos["e2"].getMoves(initPos).indexOf('e3') > -1, "white e2 pawn can move to empty e3");
+    ok(initPos["e7"].getMoves(initPos).indexOf('e6') > -1, "black e7 pawn can move to empty e6");
 });
+
+test('test pawn on init position can move two forward to empty square', function() {
+    ok(initPos["e2"].getMoves(initPos).indexOf('e4') > -1, "white e2 pawn can move to empty e4");
+    ok(initPos["e7"].getMoves(initPos).indexOf('e5') > -1, "black e7 pawn can move to empty e5");
+});
+
+test('test pawn on init position cannot move forward one square if blocked', function() {
+    equal(blockedPos["f2"].getMoves(blockedPos).indexOf('f3'), -1, "white f2 pawn cannot move to blocked f3");
+    equal(blockedPos["f7"].getMoves(blockedPos).indexOf('f6'), -1, "black e7 pawn cannot move to blocked f6");
+});
+
+test('test pawn on init position cannot move forward two square if blocked', function() {
+    equal(blockedPos["d2"].getMoves(blockedPos).indexOf('d4'), -1, "white d2 pawn cannot move to blocked d4");
+    equal(blockedPos["d7"].getMoves(blockedPos).indexOf('d5'), -1, "black d7 pawn cannot move to blocked d5");
+    
+    equal(blockedPos["f2"].getMoves(blockedPos).indexOf('f4'), -1, "white f2 pawn cannot move to f4 when f3 is blocked");
+    equal(blockedPos["f7"].getMoves(blockedPos).indexOf('f5'), -1, "black f7 pawn cannot move to f5 when f6 is blocked");
+});
+
+test('test pawn can capture opposing piece on diagonal neighbours in front of pawn', function() {
+    ok(blockedPos["e2"].getMoves(blockedPos).indexOf('f3') > -1, "white e2 can capture f3 opposing piece");
+    ok(blockedPos["e7"].getMoves(blockedPos).indexOf('f6') > -1, "black e2 can capture f6 opposing piece");
+});
+
+test('test pawn cannot move to diagonal neighbours when no opposing piece', function() {
+    equal(blockedPos["e2"].getMoves(blockedPos).indexOf('d3'), -1, "white e2 cannot move to empty d3");
+    equal(blockedPos["e7"].getMoves(blockedPos).indexOf('d6'), -1, "black e2 cannot move to empty d6");
+});
+
+test('test pawn cannot move to diagonal neighbours when occupied of same color piece', function() {
+    equal(blockedPos["h2"].getMoves(blockedPos).indexOf('g3'), -1, "white h2 cannot move to occupied g3");
+    equal(blockedPos["h7"].getMoves(blockedPos).indexOf('g6'), -1, "black h2 cannot move to occupied g6");
+});
+
