@@ -1,0 +1,3 @@
+Refaktorering: Uheldig med bruk av både coords og square, utad bør man kun
+eksponere kun square. I implementasjon bør man bruke kun square eller kun
+coords. 
