@@ -2,10 +2,46 @@
 
 var game = function (fen) {
     var that = {};
-    var positionHistory = [{}];
+    var positionHistory = [];
+
+    positionHistory.push(boardPosition(fen));
+
+    //Gets the position of the pieces after the move given by index, index 0 is the initial position.
+    //Will get the current position if index is not given.
+    that.getPiecesPosition = function (index) {
+        if (!index) index = positionHistory.length - 1;
+        var board = positionHistory[index];
+        if (!board) {
+            throw new Error("Index for this position out of range");
+        }
+        return board.pieces;
+    };
+
+    that.getPiece = function (square) {
+        return that.getPiecesPosition()[square];
+    }
+    
+    that.isLegalMove = function (fromSquare, toSquare) {
+
+    }
+
+    that.move = function (fromSquare, toSquare) {
+
+    };
+
+    return that;
+};
+
+//represent a particular board position
+var boardPosition = function (fen) {
+    var that = {};
+    that.pieces = {};
+    var activeColor, legalCastling, enPassantTarget, halfMoveClock, fullMoveNumber;
+
+    init(fen);
 
     //initialization of pieces on their initial squares
-    function init(fen) {
+    function init (fen) {
         if (!fen) {
             //FEN for starting position
             fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -28,34 +64,44 @@ var game = function (fen) {
                 if ( chr === chr.toUpperCase() ) { color = 'white'; }
                 var square = fileCoordToLetter(file) + rank.toString();
                 var piece = pieceConstructors[chr]({color: color, square: square});
-                positionHistory[0][square] = piece;
+                that.pieces[square] = piece;
             }
         }
-     }
+        activeColor = (fenParts[1] === "w") ? "white" : "black"; 
+        legalCastlings = fenParts[2];//string with KkQq
+        enPassantTarget = fenParts[3]; //square or "-"
+        halfMoveClock = parseInt(fenParts[4]);
+        fullMoveNumber = parseInt(fenParts[5]);        
+    } 
 
-     init(fen);
-
-    //Gets the position of the game after the move given by index, index 0 is the initial position.
-    //Will get the current position if index is not given.
-    that.getPosition = function (index) {
-        if (!index) index = positionHistory.length - 1;
-        return positionHistory[index];
+    that.getActiveColor = function () { 
+        return activeColor;
     };
 
-    that.getPiece = function (square) {
-        return that.getPosition()[square];
-    }
-    
     that.isLegalMove = function (fromSquare, toSquare) {
+        var piece = that.pieces[fromSquare];
+        if (!piece){
+            return false;
+        }
+        if (piece.getColor() !== activeColor) {
+            return false;
+        }
+        return piece.getMoves(that.pieces).indexOf(toSquare) !== -1; 
+    }
 
+    //assumes legal move
+    that.isCapture = function (fromSquare, toSquare) {
+        var fromPiece = that.pieces[fromSquare];        
+        var toPiece = that.pieces[toSquare];
+        return toPiece && fromPiece.getColor() !== toPiece.getColor;
     }
 
     that.move = function (fromSquare, toSquare) {
-
-    };
+        //Todo
+    }
 
     return that;
-};
+}
 
 //Piece objects
 

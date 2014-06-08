@@ -5,7 +5,7 @@ var unblockedPos, blockedPos;
 module( 'Setup game', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();  
+        initPos = newGame.getPiecesPosition();  
         var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         squares = [];
         for (var i = 0; i < 8; i++) {
@@ -26,7 +26,7 @@ function checkSquare(square, type, color) {
 }
 
 test( "test new game initialized with 32 pieces", function () {
-    var position = newGame.getPosition();
+    var position = newGame.getPiecesPosition();
     strictEqual(Object.keys(position).length, 32, "New game has 32 pieces");
 });
 
@@ -102,9 +102,9 @@ test('test is not on board', function () {
 module( 'bishop moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
-        unblockedPos = game('4k3/8/8/8/3B4/8/8/3K4').getPosition();
-        blockedPos = game('8/8/1r6/8/3B4/8/8/8').getPosition();
+        initPos = newGame.getPiecesPosition();
+        unblockedPos = game('4k3/8/8/8/3B4/8/8/3K4').getPiecesPosition();
+        blockedPos = game('8/8/1r6/8/3B4/8/8/8').getPiecesPosition();
     }
 });
 
@@ -135,9 +135,9 @@ test('test bishop can not move past square of opposing piece', function () {
 module( 'rook moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
-        unblockedPos = game('8/8/8/8/3R4/8/8/8').getPosition();
-        blockedPos = game('8/8/3b4/8/3R4/8/3N4/8').getPosition();
+        initPos = newGame.getPiecesPosition();
+        unblockedPos = game('8/8/8/8/3R4/8/8/8').getPiecesPosition();
+        blockedPos = game('8/8/3b4/8/3R4/8/3N4/8').getPiecesPosition();
     }
 });
 
@@ -173,8 +173,8 @@ test('test rook can not move to square of same color piece', function () {
 module( 'queen moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
-        blockedPos = game('8/R2N4/5r2/8/3Q4/8/3b4/8').getPosition();
+        initPos = newGame.getPiecesPosition();
+        blockedPos = game('8/R2N4/5r2/8/3Q4/8/3b4/8').getPiecesPosition();
     }
 });
 
@@ -193,8 +193,8 @@ test('test blocking/non-blocking queen moves', function () {
 module( 'knight moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
-        blockedPos = game('8/8/8/b7/8/1N6/8/2Q5').getPosition();
+        initPos = newGame.getPiecesPosition();
+        blockedPos = game('8/8/8/b7/8/1N6/8/2Q5').getPiecesPosition();
     }
 });
 
@@ -214,8 +214,8 @@ test('test blocking/non-blocking knight moves', function () {
 module( 'king moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
-        blockedPos = game('8/8/8/8/1N6/k7/1b6/8').getPosition();
+        initPos = newGame.getPiecesPosition();
+        blockedPos = game('8/8/8/8/1N6/k7/1b6/8').getPiecesPosition();
     }
 });
 
@@ -233,9 +233,9 @@ test('test blocking/non-blocking king moves', function () {
 module( 'pawn moves', {
     setup: function() {
         newGame = game();
-        initPos = newGame.getPosition();
+        initPos = newGame.getPiecesPosition();
         //blocked f pawns, and d pawn blocked on 4th/5th rank 
-        blockedPos = game('rnbqk2r/pppppp1p/5Np1/3B4/3b4/5nP1/PPPPPP1P/RNBQK2R').getPosition();
+        blockedPos = game('rnbqk2r/pppppp1p/5Np1/3B4/3b4/5nP1/PPPPPP1P/RNBQK2R').getPiecesPosition();
     }
 });
 
