@@ -2,31 +2,26 @@
 
 var game = function (fen) {
     var that = {};
-    var positionHistory = [];
+    var currentPosition = boardPosition(fen);
 
-    positionHistory.push(boardPosition(fen));
-
-    //Gets the position of the pieces after the move given by index, index 0 is the initial position.
-    //Will get the current position if index is not given.
-    that.getPiecesPosition = function (index) {
-        if (!index) index = positionHistory.length - 1;
-        var board = positionHistory[index];
-        if (!board) {
-            throw new Error("Index for this position out of range");
-        }
-        return board.pieces;
+    that.getPiecesPosition = function () {
+        return currentPosition.pieces;
     };
 
     that.getPiece = function (square) {
         return that.getPiecesPosition()[square];
-    }
+    };
     
     that.isLegalMove = function (fromSquare, toSquare) {
+        return currentPosition.isLegalMove(fromSquare, toSquare);
+    };
 
-    }
+    that.isCapture = function (fromSquare, toSquare) {
+        return currentPosition.isCapture(fromSquare, toSquare);
+    };    
 
     that.move = function (fromSquare, toSquare) {
-
+        return currentPosition.move(fromSquare, toSquare);
     };
 
     return that;
@@ -68,7 +63,7 @@ var boardPosition = function (fen) {
             }
         }
         activeColor = (fenParts[1] === "w") ? "white" : "black"; 
-        legalCastlings = fenParts[2];//string with KkQq
+        legalCastling = fenParts[2];//string with KkQq
         enPassantTarget = fenParts[3]; //square or "-"
         halfMoveClock = parseInt(fenParts[4]);
         fullMoveNumber = parseInt(fenParts[5]);        
@@ -87,21 +82,45 @@ var boardPosition = function (fen) {
             return false;
         }
         return piece.getMoves(that.pieces).indexOf(toSquare) !== -1; 
-    }
+    };
 
     //assumes legal move
     that.isCapture = function (fromSquare, toSquare) {
         var fromPiece = that.pieces[fromSquare];        
         var toPiece = that.pieces[toSquare];
-        return toPiece && fromPiece.getColor() !== toPiece.getColor;
-    }
+        return toPiece && fromPiece.getColor() !== toPiece.getColor();
+    };
 
+    //mutate object for given move, returns an object representing the move.
+    //assumes legal move
     that.move = function (fromSquare, toSquare) {
-        //Todo
-    }
+        if (that.isCapture(fromSquare, toSquare)) {
+            halfMoveClock = 0;
+        }
+        else {
+            halfMoveClock++;
+        }
+        if (that.activeColor === "black") {
+            fullMoveNumber++;
+        }
+        activeColor = (activeColor === "white") ? "black" : "white"; 
+        //TODO: enPassant and castling
+        //move piece:
+        var piece = that.pieces[fromSquare];
+        that.pieces[toSquare] = piece; 
+        piece.move(toSquare);
+        delete that.pieces[fromSquare];    
+        
+        return {
+            fromSquare: fromSquare,
+            toSquare: toSquare,
+            capturedPiece: that.pieces[toSquare]
+        };
+       
+    };
 
     return that;
-}
+};
 
 //Piece objects
 

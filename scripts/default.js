@@ -16,7 +16,7 @@ function drawBoard() {
             var color = 'white';
             if (file%2 - rank%2 === 0) color = 'black';
             var square = fileLetters[file] + (rank + 1); 
-            var $squareDiv = $('<div id ="' + name  + '" class ="square ' + color + "Square" + '"></div >'); 
+            var $squareDiv = $('<div id ="' + square + '" class ="square ' + color + "Square" + '"></div >'); 
             $squareDiv.appendTo($('#board'));
             var piece = game.getPiece(square);
             if (piece) {
@@ -33,14 +33,18 @@ function drawBoard() {
 function drop(event, ui) {
     var fromSquare = ui.draggable.parent().attr("id");
     var toSquare = $(this).attr("id");
-    //if( isCapture(fromSquare, toSquare, gameBoard)) {
-    //    $(this).children().remove();
-    //}
+    if(!game.isLegalMove(fromSquare, toSquare)) {
+        ui.draggable.css("left", 0).css("top", 0);
+        return;
+    }
+    if(game.isCapture(fromSquare, toSquare)) {
+        $(this).children().remove();
+    }
     ui.draggable
     .detach()
     .appendTo($(this))
     .css("left", 0)
     .css("top", 0);
-    //move(fromSquare, toSquare, gameBoard);
+    game.move(fromSquare, toSquare);
 }
 
