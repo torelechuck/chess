@@ -42,11 +42,15 @@ var game = function (fen) {
         return positionHistory[index];
     };
 
+    that.getPiece = function (square) {
+        return that.getPosition()[square];
+    }
+    
+    that.isLegalMove = function (fromSquare, toSquare) {
+
+    }
+
     that.move = function (fromSquare, toSquare) {
-
-    };
-
-    that.legalNextMoves = function (position) {
 
     };
 

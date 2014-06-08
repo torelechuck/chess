@@ -1,3 +1,7 @@
-Refaktorering: Uheldig med bruk av både coords og square, utad bør man kun
+Refaktorering: 
+- Uheldig med bruk av både coords og square, utad bør man kun
 eksponere kun square. I implementasjon bør man bruke kun square eller kun
 coords. 
+- Eget namespace for game. Da gir det også mening å bruke samme "FileLetters"
+  i både game som i deafult.
+
