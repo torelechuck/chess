@@ -4,4 +4,16 @@ eksponere kun square. I implementasjon bør man bruke kun square eller kun
 coords. 
 - Eget namespace for game. Da gir det også mening å bruke samme "FileLetters"
   i både game som i deafult.
+- kan være greit å fjerne mouse select av element, dette er bare
+  irritierende.
 
+Funksjonalitet:
+- enpassant, sjekke at trekk ikke fører til konge i sjakk.
+- promotion av pawns.
+
+bugs:
+- nå står brettet opp ned.
+- må sjekke gjennom logikk, mulig noen trekk ikke fungerer.
+
+teknisk gjeld:
+- mangler unit tests for isCapture() og move().
