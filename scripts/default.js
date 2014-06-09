@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 function drawBoard() {
     var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    for (var rank = 0; rank < 8; rank++) {
+    for (var rank = 7; rank >= 0; rank--) {
         for (var file = 0; file < 8; file++) {
             var color = 'white';
             if (file%2 - rank%2 === 0) color = 'black';
