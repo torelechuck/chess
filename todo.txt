@@ -10,9 +10,9 @@ Funksjonalitet:
 - enpassant, promotion av pawns, castling.
 
 bugs:
-- må sjekke gjennom logikk, mulig noen trekk ikke fungerer.
 - kan være greit å fjerne mouse select av element, dette er bare
   irritierende.
 
 tester:
 - mangler unit tests for isCapture() og move().
+

@@ -278,7 +278,7 @@ function getKnightMoves(piece, position) {
 
 function getKingMoves(piece, position) {
     var deltas = [[1, 0], [1, 1], [0, 1], [-1, 1], 
-                  [-1, 0], [-1, -1], [0, -1], [-1, -1]];
+                  [-1, 0], [-1, -1], [0, -1], [1, -1]];
     return getKingAndKnightMoves(piece, position, deltas);
 }
 
@@ -368,7 +368,7 @@ var fileCoordToLetter = (function () {
 })();
 
 var fileLetterToCoord = (function () {
-    var indexes = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 7};
+    var indexes = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8};
     return function (letter) {
         return indexes[letter];
     };
