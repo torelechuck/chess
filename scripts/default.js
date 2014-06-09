@@ -4,7 +4,8 @@ var game;
 $(document).ready(function(){
     game = game();
     drawBoard();
-    $( ".piece" ).draggable({revert: "invalid"});
+    $( ".piece" ).draggable({revert: "invalid",
+                             zIndex: 100});
     $( ".square" ).droppable({accept: ".piece",
                               drop: drop});
 });
