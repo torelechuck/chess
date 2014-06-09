@@ -27,7 +27,7 @@ var game = function (fen) {
     return that;
 };
 
-//represent a particular board position
+//represents a particular board position
 var boardPosition = function (fen) {
     var that = {};
     that.pieces = {};

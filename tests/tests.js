@@ -124,12 +124,12 @@ test('test legal moves non-blocked bishop on d4', function () {
 
 test('test bishop can move to square of opposing piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
-    ok(jQuery.inArray('b6', calculatedMoves) > -1, 'square of opposing piece (b6) in bishop moves from d4')
+    ok(jQuery.inArray('b6', calculatedMoves) > -1, 'square of opposing piece (b6) in bishop moves from d4');
 });
 
 test('test bishop can not move past square of opposing piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
-    ok(jQuery.inArray('a7', calculatedMoves) === -1, 'square past opposing piece (a7) not in bishop moves from d4')
+    ok(jQuery.inArray('a7', calculatedMoves) === -1, 'square past opposing piece (a7) not in bishop moves from d4');
 });
 
 module( 'rook moves', {
@@ -157,17 +157,17 @@ test('test legal moves non-blocked rook on d4', function () {
 
 test('test rook can move to square of opposing piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
-    ok(jQuery.inArray('d6', calculatedMoves) > -1, 'square of opposing piece (d6) in rook moves from d4')
+    ok(jQuery.inArray('d6', calculatedMoves) > -1, 'square of opposing piece (d6) in rook moves from d4');
 });
 
 test('test rook can not move past square of opposing piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
-    ok(jQuery.inArray('d7', calculatedMoves) === -1, 'square past opposing piece (d7) not in rook moves from d4')
+    ok(jQuery.inArray('d7', calculatedMoves) === -1, 'square past opposing piece (d7) not in rook moves from d4');
 });
 
 test('test rook can not move to square of same color piece', function () {
     var calculatedMoves = blockedPos['d4'].getMoves(blockedPos);
-    ok(jQuery.inArray('d2', calculatedMoves) === -1, 'square on same color piece (d2) not in rook moves from d4')
+    ok(jQuery.inArray('d2', calculatedMoves) === -1, 'square on same color piece (d2) not in rook moves from d4');
 });
 
 module( 'queen moves', {

@@ -7,7 +7,7 @@ $(document).ready(function(){
     $( ".piece" ).draggable({revert: "invalid"});
     $( ".square" ).droppable({accept: ".piece",
                               drop: drop});
-})
+});
 
 function drawBoard() {
     var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -24,10 +24,10 @@ function drawBoard() {
                 var $pieceImg = $('<img draggable="false" class="' + pieceClass + ' piece"' + 
                                   ' src =" pieces/' + pieceClass + '.svg"/>');
                 $pieceImg.appendTo($squareDiv);
-            };
+            }
 
-        };
-    };
+        }
+    }
 }
 
 function drop(event, ui) {
