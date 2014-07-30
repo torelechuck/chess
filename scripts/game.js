@@ -106,17 +106,15 @@ var boardPosition = function (fen) {
         activeColor = (activeColor === "white") ? "black" : "white"; 
         //TODO: enPassant and castling
         //move piece:
+        var res = {};
+        res.capturedPiece = that.pieces[toSquare];
         var piece = that.pieces[fromSquare];
         that.pieces[toSquare] = piece; 
         piece.move(toSquare);
         delete that.pieces[fromSquare];    
-        
-        return {
-            fromSquare: fromSquare,
-            toSquare: toSquare,
-            capturedPiece: that.pieces[toSquare]
-        };
-       
+        res.fromSquare = fromSquare;
+        res.toSquare = toSquare; 
+        return res;
     };
 
     return that;
