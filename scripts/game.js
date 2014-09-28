@@ -4,12 +4,12 @@ var game = function (fen) {
     var that = {};
     var currentPosition = boardPosition(fen);
 
-    that.getPiecesPosition = function () {
-        return currentPosition.pieces;
+    that.getPiece = function (square) {
+        return currentPosition.getPiece(square);
     };
 
-    that.getPiece = function (square) {
-        return that.getPiecesPosition()[square];
+    that.getMoves = function (square) {
+        return currentPosition.getMoves(square);
     };
     
     that.isLegalMove = function (fromSquare, toSquare) {
@@ -22,6 +22,10 @@ var game = function (fen) {
 
     that.move = function (fromSquare, toSquare) {
         return currentPosition.move(fromSquare, toSquare);
+    };
+
+    that.getCurrentPosition = function () {
+        return currentPosition;
     };
 
     return that;
@@ -68,6 +72,16 @@ var boardPosition = function (fen) {
         halfMoveClock = parseInt(fenParts[4]);
         fullMoveNumber = parseInt(fenParts[5]);        
     } 
+
+    that.getMoves = function (square) {
+        var piece = that.getPiece(square);
+        if (!piece) return [];
+        return piece.getMoves(that.pieces); 
+    };
+
+    that.getPiece = function (square) {
+        return that.pieces[square];
+    };
 
     that.getActiveColor = function () { 
         return activeColor;
