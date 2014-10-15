@@ -5,7 +5,6 @@ var unblockedPos, blockedPos;
 module( 'Setup game', {
     setup: function() {
         newGame = game();
-//        initPos = newGame.getCurrentPosition();  
         var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         squares = [];
         for (var i = 0; i < 8; i++) {
@@ -102,7 +101,6 @@ test('test is not on board', function () {
 module( 'bishop moves', {
     setup: function() {
         newGame = game();
-        //initPos = newGame.getPiecesPosition();
         unblockedPos = game('4k3/8/8/8/3B4/8/8/3K4');
         blockedPos = game('8/8/1r6/8/3B4/8/8/8');
     }
