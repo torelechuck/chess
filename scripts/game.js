@@ -106,8 +106,10 @@ var boardPosition = function (fen) {
     };
 
     //mutate object for given move, returns an object representing the move.
-    //assumes legal move
     that.move = function (fromSquare, toSquare) {
+        if (!that.isLegalMove(fromSquare, toSquare)){
+           throw error('Tried an illegal move.');
+        }
         if (that.isCapture(fromSquare, toSquare)) {
             halfMoveClock = 0;
         }
