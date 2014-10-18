@@ -1,7 +1,7 @@
-- Må fjerne square fra pieces og implementere move-metoder med piece, position
-og board.
 - Kan sannsynligvis gjøre det enklere med pieces, og trenger i hvert fall ikke
-  mer enn ett objekt per type.
+  mer enn ett objekt per type. Da trenger vi ikke lagre constructor i array,
+  kan lagre objekt direkte.
+- Bør ha eget objekt for MoveLogic.
 
 Refaktorering: 
 - Uheldig med bruk av både coords og square, utad bør man 
