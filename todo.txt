@@ -1,3 +1,8 @@
+- Må fjerne square fra pieces og implementere move-metoder med piece, position
+og board.
+- Kan sannsynligvis gjøre det enklere med pieces, og trenger i hvert fall ikke
+  mer enn ett objekt per type.
+
 Refaktorering: 
 - Uheldig med bruk av både coords og square, utad bør man 
 eksponere kun square. I implementasjon bør man bruke kun square eller kun
