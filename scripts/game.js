@@ -163,8 +163,8 @@ var pawn = function (spec) {
 
     var that = piece(spec);
  
-    that.getMoves = function (position) {
-        return getPawnMoves(that, position);
+    that.getMoves = function (board) {
+        return getPawnMoves(that, board);
     };
     
     return that;
@@ -195,8 +195,8 @@ var rook = function (spec) {
     spec.prefix = "R";    
     var that = piece(spec);
 
-    that.getMoves =  function (position) {
-        return getRookMoves(that, position); 
+    that.getMoves =  function (board) {
+        return getRookMoves(that, board); 
     };
 
     return that;
@@ -207,8 +207,8 @@ var knight = function (spec) {
     spec.prefix = "N";    
     var that = piece(spec);
 
-    that.getMoves = function (position) {
-        return getKnightMoves(that, position);
+    that.getMoves = function (board) {
+        return getKnightMoves(that, board);
     };
 
     return that;
@@ -219,8 +219,8 @@ var bishop = function (spec) {
     spec.prefix = "B";    
     var that = piece(spec);
 
-    that.getMoves = function (position) { 
-        return getBishopMoves(that, position);
+    that.getMoves = function (board) { 
+        return getBishopMoves(that, board);
     };
 
     return that;
@@ -231,8 +231,8 @@ var queen = function (spec) {
     spec.prefix = "Q";     
     var that = piece(spec);
 
-    that.getMoves = function (position) {
-        return getQueenMoves(that, position);
+    that.getMoves = function (board) {
+        return getQueenMoves(that, board);
     };
 
     return that;
@@ -243,8 +243,8 @@ var king = function (spec) {
     spec.prefix = "K";    
     var that = piece(spec);
 
-    that.getMoves = function (position) {
-        return getKingMoves(that, position);
+    that.getMoves = function (board) {
+        return getKingMoves(that, board);
     };
 
     return that;
@@ -252,20 +252,20 @@ var king = function (spec) {
 
 //Move functions
 
-function getPawnMoves (piece, position) {
+function getPawnMoves (piece, board) {
     var res = [];
     var coords = squareToCoords(piece.getSquare());
     //move one square forward
     var move1Coords = [coords[0] + piece.getDir(), coords[1]];
     var move1Square = coordsToSquare(move1Coords);
-    if (isOnBoard(move1Coords) && !position[move1Square]) {
+    if (isOnBoard(move1Coords) && !board[move1Square]) {
         res.push(move1Square);
     }
     //move two squares forward
     if (coords[0] === piece.getInitRank()) {
         var move2Coords = [coords[0] + 2*piece.getDir(), coords[1]];
         var move2Square = coordsToSquare(move2Coords);
-        if (!position[move1Square] && !position[move2Square]) {
+        if (!board[move1Square] && !board[move2Square]) {
            res.push(move2Square); 
         }
     }
@@ -273,8 +273,8 @@ function getPawnMoves (piece, position) {
     function addDiagonalMove (captureCoords) {
         var captureSquare = coordsToSquare(captureCoords);
         if (isOnBoard(captureCoords) && 
-            position[captureSquare] && 
-            position[captureSquare].getColor() !== piece.getColor()) {
+            board[captureSquare] && 
+            board[captureSquare].getColor() !== piece.getColor()) {
                 res.push(captureSquare);
         }
     }
@@ -284,19 +284,19 @@ function getPawnMoves (piece, position) {
     return res;
 }
 
-function getKnightMoves(piece, position) {
+function getKnightMoves(piece, board) {
     var deltas = [[2, 1], [1, 2], [-1, 2], [-2, 1], 
                   [-2, -1], [-1, -2], [1, -2], [2, -1]];
-    return getKingAndKnightMoves(piece, position, deltas);
+    return getKingAndKnightMoves(piece, board, deltas);
 }
 
-function getKingMoves(piece, position) {
+function getKingMoves(piece, board) {
     var deltas = [[1, 0], [1, 1], [0, 1], [-1, 1], 
                   [-1, 0], [-1, -1], [0, -1], [1, -1]];
-    return getKingAndKnightMoves(piece, position, deltas);
+    return getKingAndKnightMoves(piece, board, deltas);
 }
 
-function getKingAndKnightMoves(piece, position, deltas) {
+function getKingAndKnightMoves(piece, board, deltas) {
     var destSquare, destCoords, otherColor;
     var res = [];
     var sourceCoords = squareToCoords(piece.getSquare());
@@ -304,8 +304,8 @@ function getKingAndKnightMoves(piece, position, deltas) {
         destCoords = [sourceCoords[0] + deltas[i][0], sourceCoords[1]+ deltas[i][1]];
         destSquare = coordsToSquare(destCoords);
         otherColor = null;
-        if (position[destSquare]) { 
-            otherColor = position[destSquare].getColor();
+        if (board[destSquare]) { 
+            otherColor = board[destSquare].getColor();
         }
 
         if (isOnBoard(destCoords) && (!otherColor || piece.getColor() !== otherColor)) {
@@ -315,24 +315,24 @@ function getKingAndKnightMoves(piece, position, deltas) {
     return res;
 }
 
-function getRookMoves(piece, position) {
+function getRookMoves(piece, board) {
     var deltas = [[1,0], [0, 1], [-1, 0], [0, -1]];
-    return getStraightLineMoves(piece, position, deltas); 
+    return getStraightLineMoves(piece, board, deltas); 
 }
 
-function getBishopMoves(piece, position) {
+function getBishopMoves(piece, board) {
         var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
-        return getStraightLineMoves(piece, position, deltas); 
+        return getStraightLineMoves(piece, board, deltas); 
 }
 
-function getQueenMoves(piece, position) {
-    var bishopMoves = getBishopMoves(piece, position);
-    var rookMoves = getRookMoves(piece, position);
+function getQueenMoves(piece, board) {
+    var bishopMoves = getBishopMoves(piece, board);
+    var rookMoves = getRookMoves(piece, board);
     return bishopMoves.concat(rookMoves);
 }
 
 //helper function for bishop, rook and queen moves
-function getStraightLineMoves(piece, position, deltas) {
+function getStraightLineMoves(piece, board, deltas) {
     var res = [];
     var square, otherColor, coords;
     for (var i = 0; i < deltas.length; i++) {
@@ -341,8 +341,8 @@ function getStraightLineMoves(piece, position, deltas) {
             coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
             square = coordsToSquare(coords);
             otherColor = null;
-            if (position[square]) { 
-                otherColor = position[square].getColor();
+            if (board[square]) { 
+                otherColor = board[square].getColor();
             }
             
             if (!isOnBoard(coords) || (otherColor && piece.getColor() === otherColor)) {
