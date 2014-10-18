@@ -62,7 +62,7 @@ var boardPosition = function (fen) {
                 var color = 'black';
                 if ( chr === chr.toUpperCase() ) { color = 'white'; }
                 var square = fileCoordToLetter(file) + rank.toString();
-                var piece = pieceConstructors[chr]({color: color, square: square});
+                var piece = pieceConstructors[chr]({color: color});
                 that.pieces[square] = piece;
             }
         }
@@ -76,7 +76,7 @@ var boardPosition = function (fen) {
     that.getMoves = function (square) {
         var piece = that.getPiece(square);
         if (!piece) return [];
-        return piece.getMoves(that.pieces); 
+        return piece.getMoves(that.pieces, square); 
     };
 
     that.getPiece = function (square) {
@@ -95,17 +95,19 @@ var boardPosition = function (fen) {
         if (piece.getColor() !== activeColor) {
             return false;
         }
-        return piece.getMoves(that.pieces).indexOf(toSquare) !== -1; 
+        return piece.getMoves(that.pieces, fromSquare).indexOf(toSquare) !== -1; 
     };
 
-    //assumes legal move
     that.isCapture = function (fromSquare, toSquare) {
+        if (!that.isLegalMove(fromSquare, toSquare)){
+           throw error('Tried an illegal move.');
+        }
         var fromPiece = that.pieces[fromSquare];        
         var toPiece = that.pieces[toSquare];
         return toPiece && fromPiece.getColor() !== toPiece.getColor();
     };
 
-    //mutate object for given move, returns an object representing the move.
+    //returns an object representing the move.
     that.move = function (fromSquare, toSquare) {
         if (!that.isLegalMove(fromSquare, toSquare)){
            throw error('Tried an illegal move.');
@@ -126,7 +128,6 @@ var boardPosition = function (fen) {
         res.capturedPiece = that.pieces[toSquare];
         var piece = that.pieces[fromSquare];
         that.pieces[toSquare] = piece; 
-        piece.move(toSquare);
         delete that.pieces[fromSquare];    
         res.fromSquare = fromSquare;
         res.toSquare = toSquare; 
@@ -142,17 +143,11 @@ var boardPosition = function (fen) {
 var piece = function (spec) {
     var that = {};
 
-    var square = spec.square;
-
     that.getType = function () { return spec.type; };
 
     that.getPrefix = function () { return spec.prefix; };
 
     that.getColor = function () { return spec.color; };
-
-    that.getSquare = function () { return square; };
-
-    that.move = function (newSquare) { square = newSquare; };
 
     return that;
 };
@@ -163,8 +158,8 @@ var pawn = function (spec) {
 
     var that = piece(spec);
  
-    that.getMoves = function (board) {
-        return getPawnMoves(that, board);
+    that.getMoves = function (board, square) {
+        return getPawnMoves(that, board, square);
     };
     
     return that;
@@ -195,8 +190,8 @@ var rook = function (spec) {
     spec.prefix = "R";    
     var that = piece(spec);
 
-    that.getMoves =  function (board) {
-        return getRookMoves(that, board); 
+    that.getMoves =  function (board, square) {
+        return getRookMoves(that, board, square); 
     };
 
     return that;
@@ -207,8 +202,8 @@ var knight = function (spec) {
     spec.prefix = "N";    
     var that = piece(spec);
 
-    that.getMoves = function (board) {
-        return getKnightMoves(that, board);
+    that.getMoves = function (board, square) {
+        return getKnightMoves(that, board, square);
     };
 
     return that;
@@ -219,8 +214,8 @@ var bishop = function (spec) {
     spec.prefix = "B";    
     var that = piece(spec);
 
-    that.getMoves = function (board) { 
-        return getBishopMoves(that, board);
+    that.getMoves = function (board, square) { 
+        return getBishopMoves(that, board, square);
     };
 
     return that;
@@ -231,8 +226,8 @@ var queen = function (spec) {
     spec.prefix = "Q";     
     var that = piece(spec);
 
-    that.getMoves = function (board) {
-        return getQueenMoves(that, board);
+    that.getMoves = function (board, square) {
+        return getQueenMoves(that, board, square);
     };
 
     return that;
@@ -243,8 +238,8 @@ var king = function (spec) {
     spec.prefix = "K";    
     var that = piece(spec);
 
-    that.getMoves = function (board) {
-        return getKingMoves(that, board);
+    that.getMoves = function (board, square) {
+        return getKingMoves(that, board, square);
     };
 
     return that;
@@ -252,9 +247,9 @@ var king = function (spec) {
 
 //Move functions
 
-function getPawnMoves (piece, board) {
+function getPawnMoves (piece, board, square) {
     var res = [];
-    var coords = squareToCoords(piece.getSquare());
+    var coords = squareToCoords(square);
     //move one square forward
     var move1Coords = [coords[0] + piece.getDir(), coords[1]];
     var move1Square = coordsToSquare(move1Coords);
@@ -284,22 +279,22 @@ function getPawnMoves (piece, board) {
     return res;
 }
 
-function getKnightMoves(piece, board) {
+function getKnightMoves(piece, board, square) {
     var deltas = [[2, 1], [1, 2], [-1, 2], [-2, 1], 
                   [-2, -1], [-1, -2], [1, -2], [2, -1]];
-    return getKingAndKnightMoves(piece, board, deltas);
+    return getKingAndKnightMoves(piece, board, square, deltas);
 }
 
-function getKingMoves(piece, board) {
+function getKingMoves(piece, board, square) {
     var deltas = [[1, 0], [1, 1], [0, 1], [-1, 1], 
                   [-1, 0], [-1, -1], [0, -1], [1, -1]];
-    return getKingAndKnightMoves(piece, board, deltas);
+    return getKingAndKnightMoves(piece, board, square, deltas);
 }
 
-function getKingAndKnightMoves(piece, board, deltas) {
+function getKingAndKnightMoves(piece, board, square, deltas) {
     var destSquare, destCoords, otherColor;
     var res = [];
-    var sourceCoords = squareToCoords(piece.getSquare());
+    var sourceCoords = squareToCoords(square);
     for (var i = 0; i < deltas.length; i++) {
         destCoords = [sourceCoords[0] + deltas[i][0], sourceCoords[1]+ deltas[i][1]];
         destSquare = coordsToSquare(destCoords);
@@ -315,43 +310,43 @@ function getKingAndKnightMoves(piece, board, deltas) {
     return res;
 }
 
-function getRookMoves(piece, board) {
+function getRookMoves(piece, board, square) {
     var deltas = [[1,0], [0, 1], [-1, 0], [0, -1]];
-    return getStraightLineMoves(piece, board, deltas); 
+    return getStraightLineMoves(piece, board, square, deltas); 
 }
 
-function getBishopMoves(piece, board) {
+function getBishopMoves(piece, board, square) {
         var deltas = [[1,1], [1, -1], [-1, 1], [-1, -1]];
-        return getStraightLineMoves(piece, board, deltas); 
+        return getStraightLineMoves(piece, board, square, deltas); 
 }
 
-function getQueenMoves(piece, board) {
-    var bishopMoves = getBishopMoves(piece, board);
-    var rookMoves = getRookMoves(piece, board);
+function getQueenMoves(piece, board, square) {
+    var bishopMoves = getBishopMoves(piece, board, square);
+    var rookMoves = getRookMoves(piece, board, square);
     return bishopMoves.concat(rookMoves);
 }
 
 //helper function for bishop, rook and queen moves
-function getStraightLineMoves(piece, board, deltas) {
+function getStraightLineMoves(piece, board, square, deltas) {
     var res = [];
-    var square, otherColor, coords;
+    var otherColor, destSquare, coords;
     for (var i = 0; i < deltas.length; i++) {
-        coords = squareToCoords(piece.getSquare());
+        coords = squareToCoords(square);
         do {
             coords = [coords[0] + deltas[i][0], coords[1] + deltas[i][1]];
-            square = coordsToSquare(coords);
+            destSquare = coordsToSquare(coords);
             otherColor = null;
-            if (board[square]) { 
-                otherColor = board[square].getColor();
+            if (board[destSquare]) { 
+                otherColor = board[destSquare].getColor();
             }
             
             if (!isOnBoard(coords) || (otherColor && piece.getColor() === otherColor)) {
                 break;
             } else if (otherColor && piece.getColor() !== otherColor) {
-                res.push(square);
+                res.push(destSquare);
                 break;
             } else {
-                res.push(square);
+                res.push(destSquare);
             }
         } while (true);
     }
