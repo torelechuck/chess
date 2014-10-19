@@ -1,4 +1,3 @@
-
 var game;
 
 $(document).ready(function(){
@@ -21,7 +20,7 @@ function drawBoard() {
             $squareDiv.appendTo($('#board'));
             var piece = game.getPiece(square);
             if (piece) {
-                var pieceClass = piece.getColor() + piece.getType();
+                var pieceClass = piece.color + piece.type;
                 var $pieceImg = $('<img draggable="false" class="' + pieceClass + ' piece"' + 
                                   ' src =" pieces/' + pieceClass + '.svg"/>');
                 $pieceImg.appendTo($squareDiv);

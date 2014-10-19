@@ -1,6 +1,3 @@
-- Kan sannsynligvis gjøre det enklere med pieces, og trenger i hvert fall ikke
-  mer enn ett objekt per type. Da trenger vi ikke lagre constructor i array,
-  kan lagre objekt direkte.
 - Bør ha eget objekt for MoveLogic.
 
 Refaktorering: 

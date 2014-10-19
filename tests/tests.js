@@ -20,8 +20,8 @@ module( 'Setup game', {
 //helper function
 function checkSquare(square, type, color) {
     var piece = newGame.getPiece(square);
-    ok(piece.getType() === type && piece.getColor() === color, 
-        square + " has a " + piece.getColor() + " " + piece.getType());
+    ok(piece.type === type && piece.color === color, 
+        square + " has a " + piece.color + " " + piece.type);
 }
 
 test( "test new game initialized with 32 pieces", function () {

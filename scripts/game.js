@@ -45,8 +45,7 @@ var boardPosition = function (fen) {
             //FEN for starting position
             fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
         }
-        var pieceConstructors = {p: blackPawn, r: rook, n: knight, b: bishop, q: queen, k: king,
-                                 P: whitePawn, R: rook, N: knight, B: bishop, Q: queen, K: king};
+        var pieces = createPieces();
         var rank = 8;
         var file = 0;
         var fenParts = fen.split(' ');
@@ -59,11 +58,8 @@ var boardPosition = function (fen) {
                 file = 0;
             } else {
                 file++;
-                var color = 'black';
-                if ( chr === chr.toUpperCase() ) { color = 'white'; }
                 var square = fileCoordToLetter(file) + rank.toString();
-                var piece = pieceConstructors[chr]({color: color});
-                that.pieces[square] = piece;
+                that.pieces[square] = pieces[chr];
             }
         }
         activeColor = (fenParts[1] === "w") ? "white" : "black"; 
@@ -73,10 +69,29 @@ var boardPosition = function (fen) {
         fullMoveNumber = parseInt(fenParts[5]);        
     } 
 
+    function createPieces() {
+        var whiteRook = {type: "rook", prefix: "R", getMoves: getRookMoves, color: "white"};
+        var blackRook = {type: "rook", prefix: "R", getMoves: getRookMoves, color: "black"};
+        var whiteBishop = {type: "bishop", prefix: "B", getMoves: getBishopMoves, color: "white"};
+        var blackBishop = {type: "bishop", prefix: "B", getMoves: getBishopMoves, color: "black"};
+        var whiteKnight = {type: "knight", prefix: "N", getMoves: getKnightMoves, color: "white"};
+        var blackKnight = {type: "knight", prefix: "N", getMoves: getKnightMoves, color: "black"};
+        var whiteQueen = {type: "queen", prefix: "Q", getMoves: getQueenMoves, color: "white"};
+        var blackQueen = {type: "queen", prefix: "Q", getMoves: getQueenMoves, color: "black"};
+        var whiteKing = {type: "king", prefix: "K", getMoves: getKingMoves, color: "white"};
+        var blackKing = {type: "king", prefix: "K", getMoves: getKingMoves, color: "black"};
+        var whitePawn = {type: "pawn", prefix: "", getMoves: getPawnMoves, color: "white", 
+                         dir: 1, initRank: 2, promotionRank: 8};
+        var blackPawn = {type: "pawn", prefix: "", getMoves: getPawnMoves, color: "black", 
+                         dir: -1, initRank: 7, promotionRank: 1};
+        return {p: blackPawn, r: blackRook, n: blackKnight, b: blackBishop, q: blackQueen, k: blackKing,
+                P: whitePawn, R: whiteRook, N: whiteKnight, B: whiteBishop, Q: whiteQueen, K: whiteKing};
+    }
+    
     that.getMoves = function (square) {
         var piece = that.getPiece(square);
         if (!piece) return [];
-        return piece.getMoves(that.pieces, square); 
+        return piece.getMoves(piece, that.pieces, square); 
     };
 
     that.getPiece = function (square) {
@@ -92,25 +107,25 @@ var boardPosition = function (fen) {
         if (!piece){
             return false;
         }
-        if (piece.getColor() !== activeColor) {
+        if (piece.color !== activeColor) {
             return false;
         }
-        return piece.getMoves(that.pieces, fromSquare).indexOf(toSquare) !== -1; 
+        return piece.getMoves(piece, that.pieces, fromSquare).indexOf(toSquare) !== -1; 
     };
 
     that.isCapture = function (fromSquare, toSquare) {
         if (!that.isLegalMove(fromSquare, toSquare)){
-           throw error('Tried an illegal move.');
+           throw new Error('Tried an illegal move.');
         }
         var fromPiece = that.pieces[fromSquare];        
         var toPiece = that.pieces[toSquare];
-        return toPiece && fromPiece.getColor() !== toPiece.getColor();
+        return toPiece && fromPiece.color !== toPiece.color;
     };
 
     //returns an object representing the move.
     that.move = function (fromSquare, toSquare) {
         if (!that.isLegalMove(fromSquare, toSquare)){
-           throw error('Tried an illegal move.');
+           throw new Error('Tried an illegal move.');
         }
         if (that.isCapture(fromSquare, toSquare)) {
             halfMoveClock = 0;
@@ -137,128 +152,20 @@ var boardPosition = function (fen) {
     return that;
 };
 
-//Piece objects
-
-//base object pieces
-var piece = function (spec) {
-    var that = {};
-
-    that.getType = function () { return spec.type; };
-
-    that.getPrefix = function () { return spec.prefix; };
-
-    that.getColor = function () { return spec.color; };
-
-    return that;
-};
-
-var pawn = function (spec) {
-    spec.type = "pawn";
-    spec.prefix = "";    
-
-    var that = piece(spec);
- 
-    that.getMoves = function (board, square) {
-        return getPawnMoves(that, board, square);
-    };
-    
-    return that;
-};
-
-var whitePawn = function (spec) {
-    var that = pawn(spec);
-
-    that.getDir = function () { return 1; };
-    that.getInitRank = function () { return 2; };
-    that.getPromotionRank = function () { return 8; };
-
-    return that;
-};
-
-var blackPawn = function (spec) {
-    var that = pawn(spec);
-
-    that.getDir = function () { return -1; };
-    that.getInitRank = function () { return 7; };
-    that.getPromotionRank = function () { return 1; };
-
-    return that;
-};
-
-var rook = function (spec) {
-    spec.type = "rook";
-    spec.prefix = "R";    
-    var that = piece(spec);
-
-    that.getMoves =  function (board, square) {
-        return getRookMoves(that, board, square); 
-    };
-
-    return that;
-};
-
-var knight = function (spec) {
-    spec.type = "knight";
-    spec.prefix = "N";    
-    var that = piece(spec);
-
-    that.getMoves = function (board, square) {
-        return getKnightMoves(that, board, square);
-    };
-
-    return that;
-};
-
-var bishop = function (spec) {
-    spec.type = "bishop";
-    spec.prefix = "B";    
-    var that = piece(spec);
-
-    that.getMoves = function (board, square) { 
-        return getBishopMoves(that, board, square);
-    };
-
-    return that;
-};
-
-var queen = function (spec) {
-    spec.type = "queen";
-    spec.prefix = "Q";     
-    var that = piece(spec);
-
-    that.getMoves = function (board, square) {
-        return getQueenMoves(that, board, square);
-    };
-
-    return that;
-};
-
-var king = function (spec) {
-    spec.type = "king";
-    spec.prefix = "K";    
-    var that = piece(spec);
-
-    that.getMoves = function (board, square) {
-        return getKingMoves(that, board, square);
-    };
-
-    return that;
-};
-
 //Move functions
 
 function getPawnMoves (piece, board, square) {
     var res = [];
     var coords = squareToCoords(square);
     //move one square forward
-    var move1Coords = [coords[0] + piece.getDir(), coords[1]];
+    var move1Coords = [coords[0] + piece.dir, coords[1]];
     var move1Square = coordsToSquare(move1Coords);
     if (isOnBoard(move1Coords) && !board[move1Square]) {
         res.push(move1Square);
     }
     //move two squares forward
-    if (coords[0] === piece.getInitRank()) {
-        var move2Coords = [coords[0] + 2*piece.getDir(), coords[1]];
+    if (coords[0] === piece.initRank) {
+        var move2Coords = [coords[0] + 2*piece.dir, coords[1]];
         var move2Square = coordsToSquare(move2Coords);
         if (!board[move1Square] && !board[move2Square]) {
            res.push(move2Square); 
@@ -269,12 +176,12 @@ function getPawnMoves (piece, board, square) {
         var captureSquare = coordsToSquare(captureCoords);
         if (isOnBoard(captureCoords) && 
             board[captureSquare] && 
-            board[captureSquare].getColor() !== piece.getColor()) {
+            board[captureSquare].color !== piece.color) {
                 res.push(captureSquare);
         }
     }
-    addDiagonalMove([coords[0] + piece.getDir(), coords[1] - 1]);
-    addDiagonalMove([coords[0] + piece.getDir(), coords[1] + 1]);
+    addDiagonalMove([coords[0] + piece.dir, coords[1] - 1]);
+    addDiagonalMove([coords[0] + piece.dir, coords[1] + 1]);
     //TODO: promotion and en passant.
     return res;
 }
@@ -300,10 +207,10 @@ function getKingAndKnightMoves(piece, board, square, deltas) {
         destSquare = coordsToSquare(destCoords);
         otherColor = null;
         if (board[destSquare]) { 
-            otherColor = board[destSquare].getColor();
+            otherColor = board[destSquare].color;
         }
 
-        if (isOnBoard(destCoords) && (!otherColor || piece.getColor() !== otherColor)) {
+        if (isOnBoard(destCoords) && (!otherColor || piece.color !== otherColor)) {
             res.push(destSquare);
         }
     }
@@ -337,12 +244,12 @@ function getStraightLineMoves(piece, board, square, deltas) {
             destSquare = coordsToSquare(coords);
             otherColor = null;
             if (board[destSquare]) { 
-                otherColor = board[destSquare].getColor();
+                otherColor = board[destSquare].color;
             }
             
-            if (!isOnBoard(coords) || (otherColor && piece.getColor() === otherColor)) {
+            if (!isOnBoard(coords) || (otherColor && piece.color === otherColor)) {
                 break;
-            } else if (otherColor && piece.getColor() !== otherColor) {
+            } else if (otherColor && piece.color !== otherColor) {
                 res.push(destSquare);
                 break;
             } else {
