@@ -76,14 +76,6 @@ test("test initial king posititions", function () {
 
 module( 'utility functions' );
 
-test('test squareToCoords', function () {
-    deepEqual([4,5], squareToCoords('e4'), '[4,5] equal to e4');
-});
-
-test('test coordsToSquare', function () {
-    deepEqual('e4', coordsToSquare([4,5]), 'e4 equal to [4,5]');
-});
-
 test('test is on board', function () { 
     ok(isOnBoard([4,5]), '[4,5] (e4) is on board');
     ok(isOnBoard([1,1]), '[1,1] (a1) is on board');
