@@ -217,7 +217,7 @@ var gameLogic = (function () {
         }
 
         function getKingAndKnightMoves(piece, board, coords, deltas) {
-        var destSquare, destCoords, otherColor;
+        var destCoords, otherColor;
         var res = [];
         for (var i = 0; i < deltas.length; i++) {
             destCoords = [coords[0] + deltas[i][0], coords[1]+ deltas[i][1]];
