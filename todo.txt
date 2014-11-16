@@ -1,15 +1,9 @@
-- Bør ha eget objekt for MoveLogic.
-
-Refaktorering: 
-- Uheldig med bruk av både coords og square, utad bør man 
-eksponere kun square. I implementasjon bør man bruke kun square eller kun
-coords. 
-- Eget namespace for game. Da gir det også mening å bruke samme "FileLetters"
-  i både game og deafult.
+- flere kommentarer i gameLogic.
 
 Funksjonalitet:
 - sjekke at trekk ikke fører til konge i sjakk.
-- enpassant, promotion av pawns, castling.
+- enpassant, promotion av pawns, castling, patt, matt, remi ved repetering av
+  trekk.
 
 bugs:
 - kan være greit å fjerne mouse select av element, dette er bare
