@@ -4,7 +4,7 @@ var unblockedPos, blockedPos;
 
 module( 'Setup game', {
     setup: function() {
-        newGame = game();
+        newGame = gameLogic.game();
         var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         squares = [];
         for (var i = 0; i < 8; i++) {
@@ -74,27 +74,11 @@ test("test initial king posititions", function () {
     checkSquare(squares[7][4], "king", "black");
 });
 
-module( 'utility functions' );
-
-test('test is on board', function () { 
-    ok(isOnBoard([4,5]), '[4,5] (e4) is on board');
-    ok(isOnBoard([1,1]), '[1,1] (a1) is on board');
-    ok(isOnBoard([8,8]), '[8,8] (h8) is on board');
-    ok(isOnBoard([1,8]), '[1,8] (h1) is on board');
-});
-
-test('test is not on board', function () { 
-    ok(!isOnBoard([9,5]), '[9,5] is not on board');
-    ok(!isOnBoard([0,1]), '[0,1] is not on board');
-    ok(!isOnBoard([4,9]), '[4,9] is not on board');
-    ok(!isOnBoard([1,0]), '[1,0] is not on board');
-});
-
 module( 'bishop moves', {
     setup: function() {
-        newGame = game();
-        unblockedPos = game('4k3/8/8/8/3B4/8/8/3K4');
-        blockedPos = game('8/8/1r6/8/3B4/8/8/8');
+        newGame = gameLogic.game();
+        unblockedPos = gameLogic.game('4k3/8/8/8/3B4/8/8/3K4');
+        blockedPos = gameLogic.game('8/8/1r6/8/3B4/8/8/8');
     }
 });
 
@@ -124,9 +108,9 @@ test('test bishop can not move past square of opposing piece', function () {
 
 module( 'rook moves', {
     setup: function() {
-        newGame = game();
-        unblockedPos = game('8/8/8/8/3R4/8/8/8');
-        blockedPos = game('8/8/3b4/8/3R4/8/3N4/8');
+        newGame = gameLogic.game();
+        unblockedPos = gameLogic.game('8/8/8/8/3R4/8/8/8');
+        blockedPos = gameLogic.game('8/8/3b4/8/3R4/8/3N4/8');
     }
 });
 
@@ -161,8 +145,8 @@ test('test rook can not move to square of same color piece', function () {
 
 module( 'queen moves', {
     setup: function() {
-        newGame = game();
-        blockedPos = game('8/R2N4/5r2/8/3Q4/8/3b4/8');
+        newGame = gameLogic.game();
+        blockedPos = gameLogic.game('8/R2N4/5r2/8/3Q4/8/3b4/8');
     }
 });
 
@@ -180,8 +164,8 @@ test('test blocking/non-blocking queen moves', function () {
 
 module( 'knight moves', {
     setup: function() {
-        newGame = game();
-        blockedPos = game('8/8/8/b7/8/1N6/8/2Q5');
+        newGame = gameLogic.game();
+        blockedPos = gameLogic.game('8/8/8/b7/8/1N6/8/2Q5');
     }
 });
 
@@ -200,8 +184,8 @@ test('test blocking/non-blocking knight moves', function () {
 
 module( 'king moves', {
     setup: function() {
-        newGame = game();
-        blockedPos = game('8/8/8/8/1N6/k7/1b6/8');
+        newGame = gameLogic.game();
+        blockedPos = gameLogic.game('8/8/8/8/1N6/k7/1b6/8');
     }
 });
 
@@ -218,9 +202,9 @@ test('test blocking/non-blocking king moves', function () {
 
 module( 'pawn moves', {
     setup: function() {
-        newGame = game();
+        newGame = gameLogic.game();
         //blocked f pawns, and d pawn blocked on 4th/5th rank 
-        blockedPos = game('rnbqk2r/pppppp1p/5Np1/3B4/3b4/5nP1/PPPPPP1P/RNBQK2R');
+        blockedPos = gameLogic.game('rnbqk2r/pppppp1p/5Np1/3B4/3b4/5nP1/PPPPPP1P/RNBQK2R');
     }
 });
 

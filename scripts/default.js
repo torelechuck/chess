@@ -1,7 +1,7 @@
 var game;
 
 $(document).ready(function(){
-    game = game();
+    game = gameLogic.game();
     drawBoard();
     $( ".piece" ).draggable({revert: "invalid",
                              zIndex: 100});
@@ -10,12 +10,11 @@ $(document).ready(function(){
 });
 
 function drawBoard() {
-    var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     for (var rank = 7; rank >= 0; rank--) {
         for (var file = 0; file < 8; file++) {
             var color = 'white';
             if (file%2 - rank%2 === 0) color = 'black';
-            var square = fileLetters[file] + (rank + 1); 
+            var square = gameLogic.fileLetters[file] + (rank + 1); 
             var $squareDiv = $('<div id ="' + square + '" class ="square ' + color + "Square" + '"></div >'); 
             $squareDiv.appendTo($('#board'));
             var piece = game.getPiece(square);
