@@ -208,15 +208,15 @@ var gameLogic = (function () {
         var deltas = [[2, 1], [1, 2], [-1, 2], [-2, 1], 
                       [-2, -1], [-1, -2], [1, -2], [2, -1]];
         return getKingAndKnightMoves(piece, board, coords, deltas);
-        }
+    }
 
-        function getKingMoves(piece, board, coords) {
+    function getKingMoves(piece, board, coords) {
         var deltas = [[1, 0], [1, 1], [0, 1], [-1, 1], 
                       [-1, 0], [-1, -1], [0, -1], [1, -1]];
         return getKingAndKnightMoves(piece, board, coords, deltas);
-        }
+    }
 
-        function getKingAndKnightMoves(piece, board, coords, deltas) {
+    function getKingAndKnightMoves(piece, board, coords, deltas) {
         var destCoords, otherColor;
         var res = [];
         for (var i = 0; i < deltas.length; i++) {
