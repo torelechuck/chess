@@ -2,20 +2,26 @@ var game;
 
 $(document).ready(function(){
     game = gameLogic.game();
-    drawBoard();
+    loadGameUI();
 
     $("#prev").click(function () {
         game.prev();
         $("#board").children().remove();
-        drawBoard();
+        loadGameUI();
     });
     $("#next").click(function () {
         game.next();
         $("#board").children().remove();
-        drawBoard();
+        loadGameUI();
     });
 
 });
+
+function loadGameUI() {
+    drawBoard();
+    setDragDrop();
+    enableButtons();
+}
 
 function drawBoard() {
     for (var rank = 7; rank >= 0; rank--) {
@@ -32,15 +38,22 @@ function drawBoard() {
                                   ' src =" pieces/' + pieceClass + '.svg"/>');
                 $pieceImg.appendTo($squareDiv);
             }
-
         }
     }
+}
+
+function setDragDrop() {
     $( ".piece" ).draggable({revert: "invalid",
         zIndex: 100
     });
     $( ".square" ).droppable({accept: ".piece",
         drop: drop
     });
+}
+
+function enableButtons() {
+    $("#prev").prop("disabled", game.isFirstMove());
+    $("#next").prop("disabled", game.isLastMove());
 }
 
 function drop(event, ui) {
@@ -59,5 +72,5 @@ function drop(event, ui) {
     .css("left", 0)
     .css("top", 0);
     game.move(fromSquare, toSquare);
+    enableButtons();
 }
-

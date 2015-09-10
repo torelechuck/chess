@@ -40,13 +40,22 @@ var gameLogic = (function () {
             current++;
         };
 
+        that.isFirstMove = function () {
+            return current === 0;
+        };
+        
+        that.isLastMove = function () {
+            return current === board.length - 1;
+        };
+
         that.prev = function () {
-            if (current > 0) current--;
+            if (!that.isFirstMove()) current--;
         };
 
         that.next = function () {
-            if (current < board.length - 1) current++;
+            if (!that.isLastMove()) current++;
         };
+
 
         return that;
     };
