@@ -5,30 +5,47 @@ var gameLogic = (function () {
     //using the functional pattern for object creation/inheritance, described in "JavaScript, The good parts"
     var game = function (fen) {
         var that = {};
-        var currentPosition = boardPosition(fen);
+        var current = 0;
+        var board = [];
+        board.push(boardPosition(fen));
+
+        that.currentPosition = function () {
+            return board[current];
+        }
 
         that.getPiece = function (square) {
-            return currentPosition.getPiece(square);
+            return that.currentPosition().getPiece(square);
         };
 
         that.getMoves = function (square) {
-            return currentPosition.getMoves(square);
+            return that.currentPosition().getMoves(square);
         };
         
         that.isLegalMove = function (fromSquare, toSquare) {
-            return currentPosition.isLegalMove(fromSquare, toSquare);
+            return that.currentPosition().isLegalMove(fromSquare, toSquare);
         };
 
         that.isCapture = function (fromSquare, toSquare) {
-            return currentPosition.isCapture(fromSquare, toSquare);
+            return that.currentPosition().isCapture(fromSquare, toSquare);
         };    
 
         that.move = function (fromSquare, toSquare) {
-            return currentPosition.move(fromSquare, toSquare);
+            var nextPosition = that.currentPosition().move(fromSquare, toSquare);
+            if (current === board.length - 1) {
+                board.push(nextPosition);
+            }
+            else {
+                board.splice(current + 1, board.length, nextPosition);
+            }
+            current++;
         };
 
-        that.getCurrentPosition = function () {
-            return currentPosition;
+        that.prev = function () {
+            if (current > 0) current--;
+        };
+
+        that.next = function () {
+            if (current < board.length - 1) current++;
         };
 
         return that;
@@ -38,9 +55,12 @@ var gameLogic = (function () {
     var boardPosition = function (fen) {
         var that = {};
         that.pieces = {};
-        var activeColor, legalCastling, enPassantTarget, halfMoveClock, fullMoveNumber;
-        var coordToLetter = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8};
-
+        that.activeColor = null;
+        that.legalCastling = null;
+        that.enPassantTarget = null;
+        that.halfMoveClock = null;
+        that.fullMoveNumber = null;
+        
         init(fen);
 
         //initialization of pieces on their initial squares
@@ -66,12 +86,26 @@ var gameLogic = (function () {
                     that.pieces[square] = pieces[chr];
                 }
             }
-            activeColor = (fenParts[1] === "w") ? "white" : "black"; 
-            legalCastling = fenParts[2];//string with KkQq
-            enPassantTarget = fenParts[3]; //square or "-"
-            halfMoveClock = parseInt(fenParts[4]);
-            fullMoveNumber = parseInt(fenParts[5]);        
-        } 
+            that.activeColor = (fenParts[1] === "w") ? "white" : "black"; 
+            that.legalCastling = fenParts[2];//string with KkQq
+            that.enPassantTarget = fenParts[3]; //square or "-"
+            that.halfMoveClock = parseInt(fenParts[4]);
+            that.fullMoveNumber = parseInt(fenParts[5]);        
+        }
+
+        function copy() {
+            var copy = new boardPosition();
+            copy.activeColor = that.activeColor;
+            copy.legalCastling = that.legalCastling;
+            copy.enPassantTarget = that.enPassantTarget;
+            copy.halfMoveClock = that.halfMoveClock;
+            copy.fullMoveNumber = that.fullMoveNumber;
+            copy.pieces = {};
+            for (var key in that.pieces) {
+                copy.pieces[key] = that.pieces[key];
+            }
+            return copy;
+        }
 
         function createPieces() {
             var whiteRook = {type: "rook", prefix: "R", getMoves: getRookMoves, color: "white"};
@@ -96,7 +130,8 @@ var gameLogic = (function () {
             return fileLetters[coords[1] - 1] + coords[0].toString();
         }
 
-        function squareToCoords (square) {
+        function squareToCoords(square) {
+            var coordToLetter = { 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8 };
             return [parseInt(square[1]), coordToLetter[square[0]]];
         }
 
@@ -121,7 +156,7 @@ var gameLogic = (function () {
         };
 
         that.getActiveColor = function () { 
-            return activeColor;
+            return that.activeColor;
         };
 
         that.isLegalMove = function (fromSquare, toSquare) {
@@ -129,10 +164,10 @@ var gameLogic = (function () {
             if (!piece){
                 return false;
             }
-            if (piece.color !== activeColor) {
+            if (piece.color !== that.activeColor) {
                 return false;
             }
-                    return that.getMoves(fromSquare).indexOf(toSquare) !== -1; 
+            return that.getMoves(fromSquare).indexOf(toSquare) !== -1; 
         };
 
         that.isCapture = function (fromSquare, toSquare) {
@@ -146,29 +181,24 @@ var gameLogic = (function () {
 
         //returns an object representing the move.
         that.move = function (fromSquare, toSquare) {
+            var nextPosition = copy();
             if (!that.isLegalMove(fromSquare, toSquare)){
                throw new Error('Tried an illegal move.');
             }
             if (that.isCapture(fromSquare, toSquare)) {
-                halfMoveClock = 0;
+                nextPosition.halfMoveClock = 0;
             }
             else {
-                halfMoveClock++;
+                nextPosition.halfMoveClock = that.halfMoveClock + 1;
             }
             if (that.activeColor === "black") {
-                fullMoveNumber++;
+                nextPosition.fullMoveNumber = that.fullMoveNumber + 1;
             }
-            activeColor = (activeColor === "white") ? "black" : "white"; 
+            nextPosition.activeColor = (that.activeColor === "white") ? "black" : "white"; 
             //TODO: enPassant and castling
-            //move piece:
-            var res = {};
-            res.capturedPiece = that.pieces[toSquare];
-            var piece = that.pieces[fromSquare];
-            that.pieces[toSquare] = piece; 
-            delete that.pieces[fromSquare];    
-            res.fromSquare = fromSquare;
-            res.toSquare = toSquare; 
-            return res;
+            nextPosition.pieces[toSquare] = nextPosition.pieces[fromSquare];;
+            delete nextPosition.pieces[fromSquare];
+            return nextPosition;
         };
 
         return that;

@@ -25,7 +25,7 @@ function checkSquare(square, type, color) {
 }
 
 test( "test new game initialized with 32 pieces", function () {
-    var pieces = newGame.getCurrentPosition().pieces;
+    var pieces = newGame.currentPosition().pieces;
     strictEqual(Object.keys(pieces).length, 32, "New game has 32 pieces");
 });
 

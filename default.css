@@ -8,7 +8,16 @@ body {
     margin-right: auto; 
     margin-left: auto; 
     border: solid;
-} 
+}
+
+#buttons {
+    margin-top: 10px;
+    text-align:center;
+}
+
+#buttons button {
+    width: 100px;
+}
 
 .square {
     width: 60px;

@@ -3,10 +3,18 @@ var game;
 $(document).ready(function(){
     game = gameLogic.game();
     drawBoard();
-    $( ".piece" ).draggable({revert: "invalid",
-                             zIndex: 100});
-    $( ".square" ).droppable({accept: ".piece",
-                              drop: drop});
+
+    $("#prev").click(function () {
+        game.prev();
+        $("#board").children().remove();
+        drawBoard();
+    });
+    $("#next").click(function () {
+        game.next();
+        $("#board").children().remove();
+        drawBoard();
+    });
+
 });
 
 function drawBoard() {
@@ -27,6 +35,12 @@ function drawBoard() {
 
         }
     }
+    $( ".piece" ).draggable({revert: "invalid",
+        zIndex: 100
+    });
+    $( ".square" ).droppable({accept: ".piece",
+        drop: drop
+    });
 }
 
 function drop(event, ui) {
