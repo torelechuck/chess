@@ -26,10 +26,16 @@ var gameLogic = (function () {
         };
 
         that.isCapture = function (fromSquare, toSquare) {
+            if (!that.isLegalMove(fromSquare, toSquare)) {
+                throw new Error('Illegal move.');
+            }
             return that.currentPosition().isCapture(fromSquare, toSquare);
         };    
 
         that.move = function (fromSquare, toSquare) {
+            if (!that.isLegalMove(fromSquare, toSquare)) {
+                throw new Error('Illegal move.');
+            }
             var nextPosition = that.currentPosition().move(fromSquare, toSquare);
             if (current === board.length - 1) {
                 board.push(nextPosition);
@@ -59,7 +65,6 @@ var gameLogic = (function () {
         that.next = function () {
             if (!that.isLastMove()) current++;
         };
-
 
         return that;
     };
@@ -148,29 +153,10 @@ var gameLogic = (function () {
             return [parseInt(square[1]), coordToLetter[square[0]]];
         }
 
-        function createNextBoardPosition(fromSquare, toSquare)
-        {
-            var nextPosition = copy();
-            if (that.isCapture(fromSquare, toSquare)) {
-                nextPosition.halfMoveClock = 0;
-            }
-            else {
-                nextPosition.halfMoveClock = that.halfMoveClock + 1;
-            }
-            if (that.activeColor === "black") {
-                nextPosition.fullMoveNumber = that.fullMoveNumber + 1;
-            }
-            nextPosition.activeColor = (that.activeColor === "white") ? "black" : "white";
-            //TODO: enPassant and castling
-            nextPosition.pieces[toSquare] = nextPosition.pieces[fromSquare];;
-            delete nextPosition.pieces[fromSquare];
-            return nextPosition;
-        }
-
         function moveIsSelfCheck(fromSquare, toSquare) {
             //get all moves for next position of specified move,
             //and check if any of them is able to capture the king.
-            var nextPosition = createNextBoardPosition(fromSquare, toSquare);
+            var nextPosition = that.move(fromSquare, toSquare);
             var allNextMoves = nextPosition.getAllMoves();
             var kingPosition = null;
             for (var square in nextPosition.pieces) {
@@ -214,10 +200,6 @@ var gameLogic = (function () {
             return that.pieces[square];
         };
 
-        that.getActiveColor = function () { 
-            return that.activeColor;
-        };
-
         that.isLegalMove = function (fromSquare, toSquare) {
             var piece = that.pieces[fromSquare];
             if (!piece){
@@ -243,10 +225,21 @@ var gameLogic = (function () {
 
         //returns board position resulting from next move
         that.move = function (fromSquare, toSquare) {
-            if (!that.isLegalMove(fromSquare, toSquare)){
-               throw new Error('Tried an illegal move.');
+            var nextPosition = copy();
+            if (that.isCapture(fromSquare, toSquare)) {
+                nextPosition.halfMoveClock = 0;
             }
-            return createNextBoardPosition(fromSquare, toSquare);
+            else {
+                nextPosition.halfMoveClock = that.halfMoveClock + 1;
+            }
+            if (that.activeColor === "black") {
+                nextPosition.fullMoveNumber = that.fullMoveNumber + 1;
+            }
+            nextPosition.activeColor = (that.activeColor === "white") ? "black" : "white";
+            //TODO: enPassant and castling
+            nextPosition.pieces[toSquare] = nextPosition.pieces[fromSquare];;
+            delete nextPosition.pieces[fromSquare];
+            return nextPosition;
         };
 
         return that;
@@ -365,6 +358,5 @@ var gameLogic = (function () {
         game: game,
         fileLetters: fileLetters
     };
-
 
 })()

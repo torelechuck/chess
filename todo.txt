@@ -1,7 +1,7 @@
 - flere kommentarer i gameLogic.
 
 Funksjonalitet:
-- sjekke at trekk ikke fører til konge i sjakk.
+- sjekke at trekk ikke fører til konge i sjakk. OK
 - enpassant, promotion av pawns, castling, patt, matt, remi ved repetering av
   trekk.
 
