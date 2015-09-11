@@ -244,3 +244,30 @@ test('test pawn cannot move to diagonal neighbours when occupied of same color p
     equal(blockedPos.getMoves("h2").indexOf('g3'), -1, "white h2 cannot move to occupied g3");
     equal(blockedPos.getMoves("h7").indexOf('g6'), -1, "black h2 cannot move to occupied g6");
 });
+
+module('king capture', {
+    setup: function () {
+        newGame = gameLogic.game();
+        //black king in check if black moves rook on e5, or if king moves to d1 or f1
+        blackSelfCheck = gameLogic.game('1b2k3/7N/8/B3r3/8/8/4R3/4K3 b - - 0 1');
+    }
+});
+
+test('test all moves white', function () {
+    //Rook on h1 can capture on h2 and move to f1 and g1
+    //King on e1 can move to d1, d2, e2, f2 and f1
+    var pos = gameLogic.game('3k4/8/8/8/8/8/7r/4K2R w - - 0 1');
+    var allMoves = pos.getAllMoves();
+    equal(allMoves.length, 8, "There are exactly 8 legal moves for white");
+    notEqual(allMoves.indexOf('h2'), -1, "Rook can move to  h2");
+    notEqual(allMoves.indexOf('g1'), -1, "Rook can move to  g1");
+
+    notEqual(allMoves.indexOf('d1'), -1, "King can move to  d1");
+    notEqual(allMoves.indexOf('d2'), -1, "King can move to  d2");
+    notEqual(allMoves.indexOf('e2'), -1, "King can move to  e2");
+    notEqual(allMoves.indexOf('f2'), -1, "King can move to  f2");
+
+    equal(allMoves.filter(function (s) { return s === 'f1' }).length, 2, "Both rook and king can move to  f1");
+});
+
+

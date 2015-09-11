@@ -40,6 +40,10 @@ var gameLogic = (function () {
             current++;
         };
 
+        that.getAllMoves = function () {
+            return that.currentPosition().getAllMoves();
+        };
+
         that.isFirstMove = function () {
             return current === 0;
         };
@@ -143,6 +147,18 @@ var gameLogic = (function () {
             var coordToLetter = { 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8 };
             return [parseInt(square[1]), coordToLetter[square[0]]];
         }
+
+        that.getAllMoves = function () {
+            var allMoves = [];
+            for (var square in that.pieces) {
+                var piece = that.pieces[square];
+                if (piece.color === that.activeColor) {
+                    var moves = that.getMoves(square);
+                    Array.prototype.push.apply(allMoves, moves)
+                }
+            }
+            return allMoves;
+        };
 
         that.getMoves = function (square) {
             var piece = that.getPiece(square);
