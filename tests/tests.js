@@ -245,13 +245,7 @@ test('test pawn cannot move to diagonal neighbours when occupied of same color p
     equal(blockedPos.getMoves("h7").indexOf('g6'), -1, "black h2 cannot move to occupied g6");
 });
 
-module('king capture', {
-    setup: function () {
-        newGame = gameLogic.game();
-        //black king in check if black moves rook on e5, or if king moves to d1 or f1
-        blackSelfCheck = gameLogic.game('1b2k3/7N/8/B3r3/8/8/4R3/4K3 b - - 0 1');
-    }
-});
+module('king capture');
 
 test('test all moves white', function () {
     //Rook on h1 can capture on h2 and move to f1 and g1
@@ -270,4 +264,18 @@ test('test all moves white', function () {
     equal(allMoves.filter(function (s) { return s === 'f1' }).length, 2, "Both rook and king can move to  f1");
 });
 
+test("black self check", function () {
+    //black king in check if black moves rook on e5 horizontally, or if king moves to d8 or f8
+    pos = gameLogic.game('1b2k3/7N/8/B3r3/8/8/4R3/4K3 b - - 0 1');
 
+    ok(!pos.isLegalMove('e5', 'h5'), "Black self-checks if rook moves from e5 to h5");
+    ok(pos.isLegalMove('e5', 'e7'), "Black rook can move vertically from e5 to e6 without self-checking");
+
+    ok(!pos.isLegalMove('e8', 'd8'), "Black self-checks if king moves from e8 to d8");
+    ok(!pos.isLegalMove('e8', 'f8'), "Black self-checks if king moves from e8 to f8");
+
+    ok(pos.isLegalMove('e8', 'd7'), "Black king can move from e8 to d7 without self-checking");
+    ok(pos.isLegalMove('e8', 'e7'), "Black king can move from e8 to e7 without self-checking");
+    ok(pos.isLegalMove('e8', 'f7'), "Black king can move from e8 to f7 without self-checking");
+
+});
