@@ -247,11 +247,19 @@ test('test pawn cannot move to diagonal neighbours when occupied of same color p
 
 module('king capture');
 
+function getAllMovesToSquares(allMoves) {
+    var allMoveToSquares = [];
+    for (var i = 0; i < allMoves.length; i++) {
+        Array.prototype.push.apply(allMoveToSquares, allMoves[i].toSquares);
+    }
+    return allMoveToSquares;
+}
+
 test('test all moves white', function () {
     //Rook on h1 can capture on h2 and move to f1 and g1
     //King on e1 can move to d1, d2, e2, f2 and f1
     var pos = gameLogic.game('3k4/8/8/8/8/8/7r/4K2R w - - 0 1');
-    var allMoves = pos.getAllMoves();
+    var allMoves = getAllMovesToSquares(pos.getAllMoves());
     equal(allMoves.length, 8, "There are exactly 8 legal moves for white");
     notEqual(allMoves.indexOf('h2'), -1, "Rook can move to  h2");
     notEqual(allMoves.indexOf('g1'), -1, "Rook can move to  g1");
@@ -264,7 +272,7 @@ test('test all moves white', function () {
     equal(allMoves.filter(function (s) { return s === 'f1' }).length, 2, "Both rook and king can move to  f1");
 });
 
-test("black self check", function () {
+test("test black self check", function () {
     //black king in check if black moves rook on e5 horizontally, or if king moves to d8 or f8
     pos = gameLogic.game('1b2k3/7N/8/B3r3/8/8/4R3/4K3 b - - 0 1');
 
@@ -277,5 +285,27 @@ test("black self check", function () {
     ok(pos.isLegalMove('e8', 'd7'), "Black king can move from e8 to d7 without self-checking");
     ok(pos.isLegalMove('e8', 'e7'), "Black king can move from e8 to e7 without self-checking");
     ok(pos.isLegalMove('e8', 'f7'), "Black king can move from e8 to f7 without self-checking");
+});
 
+test("test mate", function () {
+    var pos = gameLogic.game('3k4/3p3R/8/8/Q7/6R1/8/5K2 w - - 0 1');
+
+    pos.move('a4', 'd7');
+    equal(pos.getGameStatus(), gameLogic.gameStatuses.Mate, "Queen from a4 to d6 results in mate");
+
+    pos.prev();
+    pos.move('g3', 'g8');
+    equal(pos.getGameStatus(), gameLogic.gameStatuses.Check, "King can escape to c7 if rook moves from g3 to g8");
+
+    pos.prev();
+    pos.move('a4', 'a8');
+    equal(pos.getGameStatus(), gameLogic.gameStatuses.Check, "King can escape to c7 if queen moves from a4 to a8");
+});
+
+test("test fool's mate", function () {
+    var pos = gameLogic.game("rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b - - 0 1");
+
+    pos.move("d8", "h4");
+
+    equal(pos.getGameStatus(), gameLogic.gameStatuses.Mate, "Mate when queen moves from d8 to h4");
 });

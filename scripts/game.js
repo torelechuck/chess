@@ -1,7 +1,8 @@
 var gameLogic = (function () {
 
     var fileLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    
+    var gameStatuses = { Playing: "Playing", Check: "Check", Mate: "Mate", Stalemate: "Stalemate" };
+
     //using the functional pattern for object creation/inheritance, described in "JavaScript, The good parts"
     var game = function (fen) {
         var that = {};
@@ -23,6 +24,10 @@ var gameLogic = (function () {
         
         that.isLegalMove = function (fromSquare, toSquare) {
             return that.currentPosition().isLegalMove(fromSquare, toSquare);
+        };
+
+        that.getGameStatus = function () {
+            return that.currentPosition().getGameStatus();
         };
 
         that.isCapture = function (fromSquare, toSquare) {
@@ -153,28 +158,48 @@ var gameLogic = (function () {
             return [parseInt(square[1]), coordToLetter[square[0]]];
         }
 
+        function getInactiveColor() {
+            return (that.activeColor === "white") ? "black" : "white";
+        }
+
+        function getToSquaresForMoves(moves) {
+            var toSquares = [];
+            for (var i = 0; i < moves.length; i++) {
+                Array.prototype.push.apply(toSquares, moves[i].toSquares);
+            }
+            return toSquares;
+        }
+
         function moveIsSelfCheck(fromSquare, toSquare) {
             //get all moves for next position of specified move,
             //and check if any of them is able to capture the king.
             var nextPosition = that.move(fromSquare, toSquare);
-            var allNextMoves = nextPosition.getAllMoves();
-            var kingPosition = null;
-            for (var square in nextPosition.pieces) {
-                var piece = nextPosition.pieces[square];
-                if (piece.color === that.activeColor && piece.type === "king") {
-                    kingPosition = square;
-                }
-            }
-            return allNextMoves.indexOf(kingPosition) !== -1;
+            var moves = nextPosition.getAllMoves();
+            var toSquares = getToSquaresForMoves(moves);
+            var kingPosition = nextPosition.getKingPosition(that.activeColor);
+            return toSquares.indexOf(kingPosition) !== -1;
         }
 
-        that.getAllMoves = function () {
+        that.getKingPosition = function (color) {
+            for (var square in that.pieces) {
+                var piece = that.pieces[square];
+                if (piece.color === color && piece.type === "king") {
+                    return square;
+                }
+            }
+        };
+
+        //returns an array of pairs of a fromSquare and a toSquares array
+        that.getAllMoves = function (color) {
+            if (!color) {
+                color = that.activeColor;
+            }
             var allMoves = [];
             for (var square in that.pieces) {
                 var piece = that.pieces[square];
-                if (piece.color === that.activeColor) {
+                if (piece.color === color) {
                     var moves = that.getMoves(square);
-                    Array.prototype.push.apply(allMoves, moves)
+                    allMoves.push({ fromSquare: square, toSquares: moves });
                 }
             }
             return allMoves;
@@ -217,6 +242,30 @@ var gameLogic = (function () {
             return true;
         };
 
+        that.getGameStatus = function () {
+            var inactiveMoves = that.getAllMoves(getInactiveColor());
+            var inactiveToSquares = getToSquaresForMoves(inactiveMoves);
+            var kingSquare = that.getKingPosition(that.activeColor);
+            if (inactiveToSquares.indexOf(kingSquare) !== -1) {
+                //Inactive can capture king on next move
+                //no legal moves = mate, any legal move = check
+                var activeMoves = that.getAllMoves();
+                for (var i = 0; i < activeMoves.length; i++) {
+                    for (var j = 0; j < activeMoves[i].toSquares.length; j++) {
+                        if (!moveIsSelfCheck(activeMoves[i].fromSquare, activeMoves[i].toSquares[j])) {
+                            return gameStatuses.Check;
+                        }
+                    }
+                }
+                return gameStatuses.Mate;
+            }
+            else if (inactiveMoves.length == 0) {
+                return gameStatuses.Stalemate;
+            } else {
+                return gameStatuses.Playing;
+            }
+        };
+
         that.isCapture = function (fromSquare, toSquare) {
             var fromPiece = that.pieces[fromSquare];        
             var toPiece = that.pieces[toSquare];
@@ -235,7 +284,7 @@ var gameLogic = (function () {
             if (that.activeColor === "black") {
                 nextPosition.fullMoveNumber = that.fullMoveNumber + 1;
             }
-            nextPosition.activeColor = (that.activeColor === "white") ? "black" : "white";
+            nextPosition.activeColor = getInactiveColor()
             //TODO: enPassant and castling
             nextPosition.pieces[toSquare] = nextPosition.pieces[fromSquare];;
             delete nextPosition.pieces[fromSquare];
@@ -356,7 +405,8 @@ var gameLogic = (function () {
 
     return {
         game: game,
-        fileLetters: fileLetters
+        fileLetters: fileLetters,
+        gameStatuses: gameStatuses
     };
 
 })()

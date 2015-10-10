@@ -21,6 +21,7 @@ function loadGameUI() {
     drawBoard();
     setDragDrop();
     enableButtons();
+    showGameStatus();
 }
 
 function drawBoard() {
@@ -56,6 +57,15 @@ function enableButtons() {
     $("#next").prop("disabled", game.isLastMove());
 }
 
+function showGameStatus() {
+    var gameStatus = game.getGameStatus();
+    if (gameStatus === gameLogic.gameStatuses.Playing) {
+        $("#game-status").text("");
+    } else {
+        $("#game-status").text(gameStatus);
+    }
+}
+
 function drop(event, ui) {
     var fromSquare = ui.draggable.parent().attr("id");
     var toSquare = $(this).attr("id");
@@ -73,4 +83,5 @@ function drop(event, ui) {
     .css("top", 0);
     game.move(fromSquare, toSquare);
     enableButtons();
+    showGameStatus();
 }
